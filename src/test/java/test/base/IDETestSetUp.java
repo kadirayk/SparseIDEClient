@@ -25,7 +25,7 @@ public abstract class IDETestSetUp {
 
     protected JimpleSparseIDESolver<?, ?, ?> executeSparseStaticAnalysis(String targetTestClassName) {
         setupSoot(targetTestClassName);
-        registerSootTransformers();
+        registerSparseSootTransformers();
         executeSootTransformers();
         if (sparseSolver == null) {
             throw new NullPointerException("Something went wrong sparsely solving the IDE problem!");
@@ -47,7 +47,14 @@ public abstract class IDETestSetUp {
         PackManager.v().getPack("wjtp").add(transform);
     }
 
+    private void registerSparseSootTransformers() {
+        Transform transform = new Transform("wjtp.ifds", createSparseAnalysisTransformer());
+        PackManager.v().getPack("wjtp").add(transform);
+    }
+
     protected abstract Transformer createAnalysisTransformer();
+
+    protected abstract Transformer createSparseAnalysisTransformer();
 
     /*
 	 * This method provides the options to soot to analyse the respecive
