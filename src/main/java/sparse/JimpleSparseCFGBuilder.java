@@ -38,7 +38,7 @@ public class JimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMethod
     @Override
     public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d) {
 
-        DirectedGraph<Unit> graph = (this.enableExceptions ? new ExceptionalUnitGraph(m.getActiveBody()) : new BriefUnitGraph(m.getActiveBody()));
+        DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
         JimpleSparseCFG cfg = new JimpleSparseCFG(d);
 
         List<Unit> heads = graph.getHeads();
