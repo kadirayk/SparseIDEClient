@@ -160,7 +160,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                             public Set<DFF> computeTargets(DFF source) {
                                 Set<DFF> res = new HashSet<>();
                                 res.add(source);
-                                if (source != zeroValue() && (lop == source && rop instanceof IntConstant || rop == source && lop instanceof IntConstant)) {
+                                if (source != zeroValue() && (lop == source.getValue() && rop instanceof IntConstant || rop == source.getValue() && lop instanceof IntConstant)) {
                                     res.add(DFF.asDFF(lhs));
                                 }
                                 return res;
@@ -292,10 +292,10 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                         return new EdgeFunction<Integer>() {
                             @Override
                             public Integer computeTarget(Integer source) {
-                                if (lop == srcNode && rop instanceof IntConstant) {
+                                if (lop == srcNode.getValue() && rop instanceof IntConstant) {
                                     IntConstant ic = (IntConstant) rop;
                                     return executeBinOperation(op, source, ic.value);
-                                } else if (rop == srcNode && lop instanceof IntConstant) {
+                                } else if (rop == srcNode.getValue() && lop instanceof IntConstant) {
                                     IntConstant ic = (IntConstant) lop;
                                     return executeBinOperation(op, ic.value, source);
                                 }
