@@ -1,12 +1,12 @@
 package test.constant;
 
 import analysis.IDELinearConstantAnalysisProblem;
+import analysis.data.DFF;
+import fj.P;
 import heros.InterproceduralCFG;
 import heros.solver.Pair;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import static org.junit.Assert.fail;
+
+import java.util.*;
 
 import heros.sparse.SparseCFGBuilder;
 import org.junit.Test;
@@ -23,6 +23,8 @@ import target.constant.SimpleAssignment3;
 import target.constant.SimpleAssignment4;
 import target.constant.SimpleAssignment5;
 import test.base.IDETestSetUp;
+
+import static org.junit.Assert.*;
 
 public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
@@ -57,107 +59,103 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         };
     }
 
-    void checkResultsAtLastStatement(JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis,
-                                     List<Pair<String, Integer>> expectedResult) {
+    private Set<Pair<String, Integer>> getResult(Object analysis) {
         SootMethod m = getEntryPointMethod();
-        Map<?, ?> res = analysis.resultsAt(m.getActiveBody().getUnits().getLast());
-        int correctResultCounter = 0;
-        for (Pair<String, Integer> expected : expectedResult) {
-            for (Map.Entry<?, ?> entry : res.entrySet()) {
-                Map.Entry<Local, Integer> e = (Map.Entry<Local, Integer>) entry;
-                if (expected.getO1().equals(e.getKey().getName()) && expected.getO2().intValue() == e.getValue().intValue()) {
-                    correctResultCounter++;
-                }
-            }
+        Map<DFF, Integer> res = null;
+        Set<Pair<String, Integer>> result = new HashSet<>();
+        if(analysis instanceof JimpleIDESolver){
+            JimpleIDESolver solver = (JimpleIDESolver) analysis;
+            res = (Map<DFF, Integer>) solver.resultsAt(m.getActiveBody().getUnits().getLast());
+        }else if(analysis instanceof JimpleSparseIDESolver){
+            JimpleSparseIDESolver solver = (JimpleSparseIDESolver) analysis;
+            res = (Map<DFF, Integer>)  solver.resultsAt(m.getActiveBody().getUnits().getLast());
         }
-        if (correctResultCounter != expectedResult.size()) {
-            fail("results are not complete or correct");
+        for (Map.Entry<DFF, Integer> e : res.entrySet()) {
+            Pair<String, Integer> pair = new Pair<>(e.getKey().getValue().toString(), e.getValue());
+            result.add(pair);
         }
-    }
-
-    void checkResultsAtLastStatement(JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis,
-                                     JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis,
-                                     List<Pair<String, Integer>> expectedResult) {
-        SootMethod m = getEntryPointMethod();
-        Map<?, ?> res = analysis.resultsAt(m.getActiveBody().getUnits().getLast());
-        Map<?, ?> sparseRes = sparseAnalysis.resultsAt(m.getActiveBody().getUnits().getLast());
-        int correctResultCounter = 0;
-        for (Pair<String, Integer> expected : expectedResult) {
-            for (Map.Entry<?, ?> entry : res.entrySet()) {
-                Map.Entry<Local, Integer> e = (Map.Entry<Local, Integer>) entry;
-                if (expected.getO1().equals(e.getKey().getName()) && expected.getO2().intValue() == e.getValue().intValue()) {
-                    correctResultCounter++;
-                }
-            }
-            for (Map.Entry<?, ?> entry : sparseRes.entrySet()) {
-                Map.Entry<Local, Integer> e = (Map.Entry<Local, Integer>) entry;
-                if (expected.getO1().equals(e.getKey().getName()) && expected.getO2().intValue() == e.getValue().intValue()) {
-                    correctResultCounter++;
-                }
-            }
-        }
-        if (correctResultCounter != expectedResult.size()) {
-            fail("results are not complete or correct");
-        }
+        return result;
     }
 
     @Test
     public void SimpleAssignment() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(SimpleAssignment.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
         JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(SimpleAssignment.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 200));
-        checkResultsAtLastStatement(analysis, sparseAnalysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    private void checkResults(Set<Pair<String, Integer>> defaultIDEResult, Set<Pair<String, Integer>> sparseIDEResult, Set<Pair<String, Integer>> expected) {
+        assertEquals(expected, defaultIDEResult);
+        assertEquals(expected, sparseIDEResult);
     }
 
     @Test
     public void SimpleAssignment2() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(SimpleAssignment2.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(SimpleAssignment2.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 200));
         expected.add(new Pair("c", 40));
-        checkResultsAtLastStatement(analysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 
     @Test
     public void SimpleAssignment3() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(SimpleAssignment3.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(SimpleAssignment3.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 200));
         expected.add(new Pair("c", 400));
-        checkResultsAtLastStatement(analysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 
     @Test
     public void SimpleAssignment4() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(SimpleAssignment4.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(SimpleAssignment4.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 200));
         expected.add(new Pair("c", 413));
-        checkResultsAtLastStatement(analysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 
     @Test
     public void SimpleAssignment5() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(SimpleAssignment5.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(SimpleAssignment5.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 13));
         expected.add(new Pair("b", 200));
-        checkResultsAtLastStatement(analysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 
     @Test
     public void FunctionCall2() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(FunctionCall2.class.getName());
-        List<Pair<String, Integer>> expected = new ArrayList<>();
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(FunctionCall2.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 200));
         expected.add(new Pair("c", 101));
         expected.add(new Pair("d", 201));
-        checkResultsAtLastStatement(analysis, expected);
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 }

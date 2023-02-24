@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import analysis.data.DFF;
 import heros.*;
 import heros.edgefunc.AllBottom;
 import heros.edgefunc.AllTop;
@@ -25,7 +26,7 @@ import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.ide.DefaultJimpleIDETabulationProblem;
 import soot.jimple.*;
 
-public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulationProblem<Local, Integer, InterproceduralCFG<Unit, SootMethod>> {
+public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulationProblem<DFF, Integer, InterproceduralCFG<Unit, SootMethod>> {
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
@@ -135,10 +136,10 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
     }
 
     @Override
-    protected FlowFunctions<Unit, Local, SootMethod> createFlowFunctionsFactory() {
-        return new FlowFunctions<Unit, Local, SootMethod>() {
+    protected FlowFunctions<Unit, DFF, SootMethod> createFlowFunctionsFactory() {
+        return new FlowFunctions<Unit, DFF, SootMethod>() {
             @Override
-            public FlowFunction<Local> getNormalFlowFunction(Unit curr, Unit succ) {
+            public FlowFunction<DFF> getNormalFlowFunction(Unit curr, Unit succ) {
                 // check if we have definitions of constant integers
                 if (curr instanceof DefinitionStmt) {
                     DefinitionStmt assignment = (DefinitionStmt) curr;
@@ -147,20 +148,20 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                     // check if rhs is a constant integer
                     if (rhs instanceof IntConstant) {
                         IntConstant iconst = (IntConstant) rhs;
-                        return new Gen(lhs, zeroValue());
+                        return new Gen(new DFF(lhs, curr), zeroValue());
                     }
                     // check if rhs is a binary expression with known values
                     if (rhs instanceof BinopExpr) {
                         BinopExpr binop = (BinopExpr) rhs;
                         Value lop = binop.getOp1();
                         Value rop = binop.getOp2();
-                        return new FlowFunction<Local>() {
+                        return new FlowFunction<DFF>() {
                             @Override
-                            public Set<Local> computeTargets(Local source) {
-                                Set<Local> res = new HashSet<>();
+                            public Set<DFF> computeTargets(DFF source) {
+                                Set<DFF> res = new HashSet<>();
                                 res.add(source);
                                 if (source != zeroValue() && (lop == source && rop instanceof IntConstant || rop == source && lop instanceof IntConstant)) {
-                                    res.add((Local) lhs);
+                                    res.add(DFF.asDFF(lhs));
                                 }
                                 return res;
                             }
@@ -171,7 +172,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
             }
 
             @Override
-            public FlowFunction<Local> getCallFlowFunction(Unit callStmt, SootMethod dest) {
+            public FlowFunction<DFF> getCallFlowFunction(Unit callStmt, SootMethod dest) {
                 Stmt s = (Stmt) callStmt;
                 InvokeExpr ie = s.getInvokeExpr();
                 final List<Value> callArgs = ie.getArgs();
@@ -179,22 +180,22 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                 for (int i = 0; i < dest.getParameterCount(); i++) {
                     paramLocals.add(dest.getActiveBody().getParameterLocal(i));
                 }
-                return new FlowFunction<Local>() {
+                return new FlowFunction<DFF>() {
                     @Override
-                    public Set<Local> computeTargets(Local source) {
+                    public Set<DFF> computeTargets(DFF source) {
                         //ignore implicit calls to static initializers
                         if (dest.getName().equals(SootMethod.staticInitializerName) && dest.getParameterCount() == 0) {
                             return Collections.emptySet();
                         }
-                        Set<Local> res = new HashSet<>();
+                        Set<DFF> res = new HashSet<>();
                         for (int i = 0; i < callArgs.size(); i++) {
                             // Special case: check if function is called with integer literals as params
                             if (callArgs.get(i) instanceof IntConstant && source == zeroValue()) {
-                                res.add(paramLocals.get(i));
+                                res.add(DFF.asDFF(paramLocals.get(i)));
                             }
                             // Ordinary case: just perform the mapping
                             if (callArgs.get(i) == source) {
-                                res.add(paramLocals.get(i));
+                                res.add(DFF.asDFF(paramLocals.get(i)));
                             }
                         }
                         return res;
@@ -203,7 +204,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
             }
 
             @Override
-            public FlowFunction<Local> getReturnFlowFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Unit returnSite) {
+            public FlowFunction<DFF> getReturnFlowFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Unit returnSite) {
                 // handle the case: int i = returnConstant();
                 if (exitStmt instanceof ReturnStmt) {
                     ReturnStmt returnStmt = (ReturnStmt) exitStmt;
@@ -215,11 +216,12 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                             if (leftOp instanceof Local) {
                                 final Local tgtLocal = (Local) leftOp;
                                 final Local retLocal = (Local) op;
-                                return new FlowFunction<Local>() {
+                                return new FlowFunction<DFF>() {
                                     @Override
-                                    public Set<Local> computeTargets(Local source) {
-                                        if (source == retLocal) {
-                                            return Collections.singleton(tgtLocal);
+                                    public Set<DFF> computeTargets(DFF source) {
+                                        if (source.equals(DFF.asDFF(retLocal))) {
+                                            // TODO: test this, it was == check before when it was Local
+                                            return Collections.singleton(DFF.asDFF(tgtLocal));
                                         }
                                         return Collections.emptySet();
                                     }
@@ -232,17 +234,17 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
             }
 
             @Override
-            public FlowFunction<Local> getCallToReturnFlowFunction(Unit callSite, Unit returnSite) {
+            public FlowFunction<DFF> getCallToReturnFlowFunction(Unit callSite, Unit returnSite) {
                 return Identity.v();
             }
         };
     }
 
     @Override
-    protected EdgeFunctions<Unit, Local, SootMethod, Integer> createEdgeFunctionsFactory() {
-        return new EdgeFunctions<Unit, Local, SootMethod, Integer>() {
+    protected EdgeFunctions<Unit, DFF, SootMethod, Integer> createEdgeFunctionsFactory() {
+        return new EdgeFunctions<Unit, DFF, SootMethod, Integer>() {
             @Override
-            public EdgeFunction<Integer> getNormalEdgeFunction(Unit src, Local srcNode, Unit tgt, Local tgtNode) {
+            public EdgeFunction<Integer> getNormalEdgeFunction(Unit src, DFF srcNode, Unit tgt, DFF tgtNode) {
                 if (srcNode == zeroValue() && tgtNode == zeroValue()) {
                     return ALL_BOTTOM;
                 }
@@ -251,7 +253,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                     Value lhs = assignment.getLeftOp();
                     Value rhs = assignment.getRightOp();
                     // check if lhs is the tgtNode we are looking at and if rhs is a constant integer
-                    if (lhs == tgtNode && rhs instanceof IntConstant) {
+                    if (lhs == tgtNode.getValue() && rhs instanceof IntConstant) {
                         IntConstant iconst = (IntConstant) rhs;
                         return new EdgeFunction<Integer>() {
                             @Override
@@ -282,7 +284,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                         };
                     }
                     // check if rhs is a binary expression with known values
-                    if (lhs == tgtNode && rhs instanceof BinopExpr) {
+                    if (lhs == tgtNode.getValue() && rhs instanceof BinopExpr) {
                         BinopExpr binop = (BinopExpr) rhs;
                         Value lop = binop.getOp1();
                         Value rop = binop.getOp2();
@@ -322,29 +324,29 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
             }
 
             @Override
-            public EdgeFunction<Integer> getCallEdgeFunction(Unit callStmt, Local srcNode, SootMethod destinationMethod, Local destNode) {
+            public EdgeFunction<Integer> getCallEdgeFunction(Unit callStmt, DFF srcNode, SootMethod destinationMethod, DFF destNode) {
                 return EdgeIdentity.v();
             }
 
             @Override
-            public EdgeFunction<Integer> getReturnEdgeFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Local exitNode, Unit returnSite, Local retNode) {
+            public EdgeFunction<Integer> getReturnEdgeFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, DFF exitNode, Unit returnSite, DFF retNode) {
                 return EdgeIdentity.v();
             }
 
             @Override
-            public EdgeFunction<Integer> getCallToReturnEdgeFunction(Unit callStmt, Local callNode, Unit returnSite, Local returnSideNode) {
+            public EdgeFunction<Integer> getCallToReturnEdgeFunction(Unit callStmt, DFF callNode, Unit returnSite, DFF returnSideNode) {
                 return EdgeIdentity.v();
             }
         };
     }
 
     @Override
-    protected JimpleLocal createZeroValue() {
-        return new JimpleLocal("<<zero>>", NullType.v());
+    protected DFF createZeroValue() {
+        return DFF.asDFF(new JimpleLocal("<<zero>>", NullType.v()));
     }
 
     @Override
-    public Map<Unit, Set<Local>> initialSeeds() {
+    public Map<Unit, Set<DFF>> initialSeeds() {
         for (SootClass c : Scene.v().getApplicationClasses()) {
             for (SootMethod m : c.getMethods()) {
                 if (!m.hasActiveBody()) {
