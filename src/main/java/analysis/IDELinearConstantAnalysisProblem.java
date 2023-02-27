@@ -194,7 +194,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                                 res.add(DFF.asDFF(paramLocals.get(i)));
                             }
                             // Ordinary case: just perform the mapping
-                            if (callArgs.get(i) == source) {
+                            if (DFF.asDFF(callArgs.get(i)).equals(source)) {
                                 res.add(DFF.asDFF(paramLocals.get(i)));
                             }
                         }

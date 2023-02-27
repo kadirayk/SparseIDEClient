@@ -7,6 +7,7 @@ import heros.InterproceduralCFG;
 import heros.solver.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import heros.sparse.SparseCFGBuilder;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import solver.JimpleIDESolver;
 import soot.*;
 
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
-import sparse.JimpleSparseCFGBuilder;
+import sparse.CPAJimpleSparseCFGBuilder;
 import sparse.JimpleSparseIDESolver;
 import target.constant.FunctionCall2;
 import target.constant.SimpleAssignment;
@@ -50,7 +51,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
             protected void internalTransform(String phaseName, Map<String, String> options) {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
-                SparseCFGBuilder sparseCFGBuilder = new JimpleSparseCFGBuilder(true);
+                SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(true);
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                 solver.solve();
@@ -90,6 +91,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
     }
 
     private void checkResults(Set<Pair<String, Integer>> defaultIDEResult, Set<Pair<String, Integer>> sparseIDEResult, Set<Pair<String, Integer>> expected) {
+        // first remove intermediate vars
+        defaultIDEResult = defaultIDEResult.stream().filter(p -> !p.getO1().startsWith("$stack")).collect(Collectors.toSet());
+        sparseIDEResult = sparseIDEResult.stream().filter(p -> !p.getO1().startsWith("$stack")).collect(Collectors.toSet());
         assertEquals(expected, defaultIDEResult);
         assertEquals(expected, sparseIDEResult);
     }
