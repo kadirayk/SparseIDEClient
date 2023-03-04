@@ -4,7 +4,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import aliasing.SparseAliasManager;
 import analysis.data.DFF;
+import analysis.edgefunctions.IntegerAssign;
+import analysis.edgefunctions.IntegerBinop;
+import analysis.edgefunctions.IntegerTop;
+import boomerang.scene.Val;
+import boomerang.scene.jimple.JimpleVal;
+import boomerang.scene.sparse.SparseCFGCache;
+import boomerang.util.AccessPath;
 import heros.*;
 import heros.edgefunc.AllBottom;
 import heros.edgefunc.AllTop;
@@ -22,6 +30,7 @@ import soot.SootClass;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
+import soot.jimple.internal.JInstanceFieldRef;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.ide.DefaultJimpleIDETabulationProblem;
 import soot.jimple.*;
@@ -32,9 +41,9 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     private final static EdgeFunction<Integer> ALL_BOTTOM = new AllBottom<>(Integer.MAX_VALUE);
 
-    protected final static Integer TOP = Integer.MIN_VALUE;
+    protected final static Integer TOP = Integer.MIN_VALUE; // Unknown
 
-    protected final static Integer BOTTOM = Integer.MAX_VALUE;
+    protected final static Integer BOTTOM = Integer.MAX_VALUE; // Not Constant
 
     private int executeBinOperation(String op, int lhs, int rhs) {
         int res;
@@ -65,48 +74,10 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
         this.icfg = icfg;
     }
 
-    protected class EdgeFunctionComposer implements EdgeFunction<Integer> {
-
-        private final EdgeFunction<Integer> F;
-        private final EdgeFunction<Integer> G;
-
-        public EdgeFunctionComposer(EdgeFunction<Integer> F, EdgeFunction<Integer> G) {
-            this.F = F;
-            this.G = G;
-        }
-
-        @Override
-        public Integer computeTarget(Integer source) {
-            return F.computeTarget(G.computeTarget(source));
-        }
-
-        @Override
-        public EdgeFunction<Integer> composeWith(EdgeFunction<Integer> secondFunction) {
-            return G.composeWith(F.composeWith(secondFunction));
-        }
-
-        @Override
-        public EdgeFunction<Integer> meetWith(EdgeFunction<Integer> otherFunction) {
-            // FIXME: needs improvement, but is good enough to analyze the current target programs
-            if (this == ALL_BOTTOM && otherFunction != ALL_BOTTOM) {
-                return otherFunction;
-            } else if (this != ALL_BOTTOM && otherFunction == ALL_BOTTOM) {
-                return this;
-            } else {
-                return this;
-            }
-        }
-
-        @Override
-        public boolean equalTo(EdgeFunction<Integer> other) {
-            return F.equalTo(other);
-        }
-
-    }
 
     @Override
     protected EdgeFunction<Integer> createAllTopFunction() {
-        return new AllTop<>(TOP);
+        return IntegerTop.v();
     }
 
     @Override
@@ -124,11 +95,21 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
             @Override
             public Integer meet(Integer left, Integer right) {
-                if (left == TOP && right != BOTTOM) {
+                if(left==TOP){
                     return right;
-                } else if (right == TOP && left != BOTTOM) {
+                }
+                if(right==TOP){
                     return left;
-                } else {
+                }
+                if(left==BOTTOM){
+                    return left;
+                }
+                if(right==BOTTOM){
+                    return right;
+                }
+                if(left==right){
+                    return left;
+                }else{
                     return BOTTOM;
                 }
             }
@@ -161,6 +142,49 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                                 Set<DFF> res = new HashSet<>();
                                 res.add(source);
                                 if (source != zeroValue() && (lop == source.getValue() && rop instanceof IntConstant || rop == source.getValue() && lop instanceof IntConstant)) {
+                                    res.add(DFF.asDFF(lhs));
+                                }
+                                return res;
+                            }
+                        };
+                    }
+                    // check simple assignment
+                    if(rhs instanceof Local){
+                        Local right = (Local) rhs;
+                        return new FlowFunction<DFF>() {
+                            @Override
+                            public Set<DFF> computeTargets(DFF source) {
+                                Set<DFF> res = new HashSet<>();
+                                res.add(source);
+                                if(DFF.asDFF(right).equals(source)){
+                                    if(lhs instanceof JInstanceFieldRef){
+                                        JInstanceFieldRef fieldRef = (JInstanceFieldRef) lhs;
+                                        SparseAliasManager aliasManager = SparseAliasManager.getInstance(SparseCFGCache.SparsificationStrategy.NONE, true);
+                                        Set<AccessPath> aliases = aliasManager.getAliases((Stmt) curr, icfg.getMethodOf(curr), fieldRef.getBase());
+                                        for (AccessPath alias : aliases) {
+                                            Val base = alias.getBase();
+                                            if(base instanceof JimpleVal){
+                                                JimpleVal jval = (JimpleVal) base;
+                                                Value delegate = jval.getDelegate();
+                                                res.add(new DFF(delegate, curr, Collections.singletonList(fieldRef.getField())));
+                                            }
+                                        }
+                                    }
+                                    res.add(DFF.asDFF(lhs));
+                                }
+                                return res;
+                            }
+                        };
+                    }
+                    // check field load
+                    if(rhs instanceof JInstanceFieldRef){
+                        JInstanceFieldRef fieldRef = (JInstanceFieldRef) rhs;
+                        return new FlowFunction<DFF>() {
+                            @Override
+                            public Set<DFF> computeTargets(DFF source) {
+                                Set<DFF> res = new HashSet<>();
+                                res.add(source);
+                                if(DFF.asDFF(fieldRef).equals(source)){
                                     res.add(DFF.asDFF(lhs));
                                 }
                                 return res;
@@ -255,69 +279,12 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                     // check if lhs is the tgtNode we are looking at and if rhs is a constant integer
                     if (lhs == tgtNode.getValue() && rhs instanceof IntConstant) {
                         IntConstant iconst = (IntConstant) rhs;
-                        return new EdgeFunction<Integer>() {
-                            @Override
-                            public Integer computeTarget(Integer source) {
-                                return iconst.value;
-                            }
-
-                            @Override
-                            public EdgeFunction<Integer> composeWith(EdgeFunction<Integer> secondFunction) {
-                                return new EdgeFunctionComposer(secondFunction, this);
-                            }
-
-                            @Override
-                            public EdgeFunction<Integer> meetWith(EdgeFunction<Integer> otherFunction) {
-                                if (this == ALL_BOTTOM && otherFunction != ALL_BOTTOM) {
-                                    return otherFunction;
-                                } else if (this != ALL_BOTTOM && otherFunction == ALL_BOTTOM) {
-                                    return this;
-                                } else {
-                                    return this;
-                                }
-                            }
-
-                            @Override
-                            public boolean equalTo(EdgeFunction<Integer> other) {
-                                return this == other;
-                            }
-                        };
+                        return new IntegerAssign(iconst.value);
                     }
                     // check if rhs is a binary expression with known values
                     if (lhs == tgtNode.getValue() && rhs instanceof BinopExpr) {
                         BinopExpr binop = (BinopExpr) rhs;
-                        Value lop = binop.getOp1();
-                        Value rop = binop.getOp2();
-                        String op = binop.getSymbol();
-                        return new EdgeFunction<Integer>() {
-                            @Override
-                            public Integer computeTarget(Integer source) {
-                                if (lop == srcNode.getValue() && rop instanceof IntConstant) {
-                                    IntConstant ic = (IntConstant) rop;
-                                    return executeBinOperation(op, source, ic.value);
-                                } else if (rop == srcNode.getValue() && lop instanceof IntConstant) {
-                                    IntConstant ic = (IntConstant) lop;
-                                    return executeBinOperation(op, ic.value, source);
-                                }
-                                throw new IllegalStateException("Only linear constant propagation can be specified!");
-                            }
-
-                            @Override
-                            public EdgeFunction<Integer> meetWith(EdgeFunction otherFunction) {
-                                throw new UnsupportedOperationException("int i = j op const .meetWith()");
-//                                return this;
-                            }
-
-                            @Override
-                            public EdgeFunction composeWith(EdgeFunction secondFunction) {
-                                return new EdgeFunctionComposer(secondFunction, this);
-                            }
-
-                            @Override
-                            public boolean equalTo(EdgeFunction other) {
-                                return this == other;
-                            }
-                        };
+                        return new IntegerBinop(binop, srcNode);
                     }
                 }
                 return EdgeIdentity.v();

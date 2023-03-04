@@ -226,10 +226,10 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
                         return true;
                     }
                     // D can be among aliases of base, if so keep v.m() for D
-                    else if (AliasManager.isTargetDFFOrAlias(stmt, m, base, d)) {
-                        addedInvoke = true;
-                        return true;
-                    }
+//                    else if (AliasManager.isTargetDFFOrAlias(stmt, m, base, d)) {
+//                        addedInvoke = true;
+//                        return true;
+//                    }
                 }
             }
         }
