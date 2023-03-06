@@ -1,8 +1,6 @@
-package analysis.edgefunctions;
+package analysis.edgefunctions.normal;
 
 import heros.EdgeFunction;
-import heros.edgefunc.AllTop;
-import heros.edgefunc.EdgeIdentity;
 
 /**
  * Think reverse

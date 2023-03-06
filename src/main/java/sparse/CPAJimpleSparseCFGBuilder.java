@@ -1,6 +1,5 @@
 package sparse;
 
-import aliasing.AliasManager;
 import analysis.data.DFF;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
@@ -178,8 +177,6 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
             } else {
                 right = DFF.asDFF(rightOp);
             }
-
-
 
             if (d.equals(left) || d.equals(right)) {
                 if(rightOp instanceof InvokeExpr){

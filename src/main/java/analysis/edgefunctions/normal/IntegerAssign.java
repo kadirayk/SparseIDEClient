@@ -1,8 +1,7 @@
-package analysis.edgefunctions;
+package analysis.edgefunctions.normal;
 
 import heros.EdgeFunction;
 import heros.edgefunc.AllBottom;
-import heros.edgefunc.AllTop;
 import heros.edgefunc.EdgeIdentity;
 import soot.Value;
 import soot.jimple.BinopExpr;

@@ -80,8 +80,17 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         defaultIDEResult = defaultIDEResult.stream().filter(pred.get()).collect(Collectors.toSet());
         sparseIDEResult = sparseIDEResult.stream().filter(pred.get()).collect(Collectors.toSet());
         assertEquals(defaultIDEResult, sparseIDEResult);
-        assertTrue(defaultIDEResult.containsAll(expected));
-        assertTrue(sparseIDEResult.containsAll(expected));
+        assertTrue(msg(defaultIDEResult, expected), defaultIDEResult.containsAll(expected));
+        assertTrue(msg(sparseIDEResult, expected), sparseIDEResult.containsAll(expected));
+    }
+
+    private String msg(Set<Pair<String, Integer>> actual, Set<Pair<String, Integer>> expected){
+        StringBuilder str = new StringBuilder(System.lineSeparator());
+        str.append("actual:").append(System.lineSeparator());
+        str.append(actual.stream().map(p->p.toString()).collect(Collectors.joining("-"))).append(System.lineSeparator());
+        str.append("expected:").append(System.lineSeparator());
+        str.append(expected.stream().map(p->p.toString()).collect(Collectors.joining("-"))).append(System.lineSeparator());
+        return str.toString();
     }
 
     @Test

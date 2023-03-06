@@ -1,4 +1,4 @@
-package analysis.edgefunctions;
+package analysis.edgefunctions.normal;
 
 import analysis.data.DFF;
 import heros.EdgeFunction;
