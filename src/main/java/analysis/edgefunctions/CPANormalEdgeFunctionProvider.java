@@ -1,5 +1,6 @@
 package analysis.edgefunctions;
 
+import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
 import analysis.edgefunctions.normal.IntegerAssign;
 import analysis.edgefunctions.normal.IntegerBinop;
@@ -14,7 +15,7 @@ import soot.jimple.IntConstant;
 
 public class CPANormalEdgeFunctionProvider {
 
-    private final static EdgeFunction<Integer> ALL_BOTTOM = new AllBottom<>(Integer.MAX_VALUE);
+    private final static EdgeFunction<Integer> ALL_BOTTOM = new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
 
     private EdgeFunction<Integer> edgeFunction;
 

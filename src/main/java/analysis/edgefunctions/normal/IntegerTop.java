@@ -1,5 +1,6 @@
 package analysis.edgefunctions.normal;
 
+import analysis.IDELinearConstantAnalysisProblem;
 import heros.EdgeFunction;
 
 /**
@@ -9,7 +10,7 @@ public class IntegerTop implements EdgeFunction<Integer> {
 
     private static final IntegerTop instance = new IntegerTop();
 
-    Integer value = Integer.MIN_VALUE;
+    Integer value = IDELinearConstantAnalysisProblem.TOP;
 
     private IntegerTop(){
     }

@@ -1,11 +1,14 @@
 package target.constant;
 
-public class SimpleAssignment5 {
+public class Assignment2 {
 
+    /**
+     * Assignment with binop of constants
+     */
     public void entryPoint() {
         int a = 100;
         int b = 200;
-        a = 13;
+        int c = 10 * 4;
     }
 
 }

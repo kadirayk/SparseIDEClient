@@ -1,6 +1,8 @@
 package analysis.edgefunctions.normal;
 
+import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
+import analysis.edgefunctions.IntegerAllBottom;
 import heros.EdgeFunction;
 import heros.edgefunc.EdgeIdentity;
 import soot.Value;
@@ -65,8 +67,16 @@ public class IntegerBinop implements EdgeFunction<Integer> {
 
     @Override
     public EdgeFunction<Integer> meetWith(EdgeFunction otherFunction) {
-        throw new UnsupportedOperationException("int i = j op const .meetWith()");
-//                                return this;
+        if(otherFunction instanceof EdgeIdentity){
+            return this;
+        }else if(otherFunction instanceof IntegerAssign){
+            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+        }else if(otherFunction instanceof IntegerBinop){
+            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+        }else if(otherFunction instanceof IntegerAllBottom){
+            return otherFunction;
+        }
+        throw new RuntimeException("can't meeet: " + this.toString() + " and " + otherFunction.toString());
     }
 
     @Override

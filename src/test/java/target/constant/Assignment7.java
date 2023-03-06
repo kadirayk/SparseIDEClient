@@ -1,7 +1,10 @@
 package target.constant;
 
-public class SimpleAssignment7 {
+public class Assignment7 {
 
+    /**
+     * various operators
+     */
     public void entryPoint() {
         int a = 100;
         int b = a + 10;

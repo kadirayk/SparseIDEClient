@@ -2,6 +2,10 @@ package target.constant;
 
 public class Branching2 {
 
+    /**
+     * same value in different branches not used in the end
+     * @param p unknown
+     */
     void entryPoint(boolean p) {
         int a = 0;
         int b = 0;

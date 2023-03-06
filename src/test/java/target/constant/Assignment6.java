@@ -1,11 +1,15 @@
 package target.constant;
 
-public class SimpleAssignment2 {
+public class Assignment6 {
 
+    /**
+     * Increment value
+     */
     public void entryPoint() {
         int a = 100;
         int b = 200;
-        int c = 10 * 4;
+        a++;
+        b += 1;
     }
 
 }

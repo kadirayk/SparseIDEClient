@@ -1,6 +1,6 @@
 package target.constant;
 
-public class FunctionCall {
+public class Context {
 
     int id(int a) {
         return a;

@@ -1,6 +1,6 @@
 package target.constant;
 
-public class FunctionCall3 {
+public class Context3 {
 
     int add(int a, int b) {
         return a + 13;

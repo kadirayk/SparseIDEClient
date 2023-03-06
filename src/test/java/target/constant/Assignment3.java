@@ -1,7 +1,10 @@
 package target.constant;
 
-public class SimpleAssignment3 {
+public class Assignment3 {
 
+    /**
+     * Assignment with binop of linear value
+     */
     public void entryPoint() {
         int a = 100;
         int b = 200;

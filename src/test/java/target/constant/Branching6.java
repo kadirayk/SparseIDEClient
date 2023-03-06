@@ -1,20 +1,20 @@
 package target.constant;
 
-public class Branching {
+public class Branching6 {
 
     /**
-     * Same value in different branches used in the end
+     * same values in different branches meet with linear op
      * @param p unknown
      */
     void entryPoint(boolean p) {
         int a = 0;
-        int b = 1;
+        int b = 10;
         if (p) {
-            a = 10;
+            a = 23;
         } else {
-            a = 10;
+            a = 23;
         }
-        int c = a + 4;
+        int c = a + 3;
     }
 
 }

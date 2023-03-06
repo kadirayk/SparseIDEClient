@@ -1,5 +1,7 @@
 package analysis.edgefunctions.normal;
 
+import analysis.IDELinearConstantAnalysisProblem;
+import analysis.edgefunctions.IntegerAllBottom;
 import heros.EdgeFunction;
 import heros.edgefunc.AllBottom;
 import heros.edgefunc.EdgeIdentity;
@@ -66,11 +68,11 @@ public class IntegerAssign implements EdgeFunction<Integer> {
             if(valueFromOtherBranch==valueFromThisBranch){
                 return this;
             }else{
-                return new AllBottom<>(Integer.MAX_VALUE);
+                return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
             }
         }else if(otherFunction instanceof IntegerBinop){
-            return new AllBottom<>(Integer.MAX_VALUE);
-        }else if(otherFunction instanceof AllBottom){
+            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+        }else if(otherFunction instanceof IntegerAllBottom){
             return otherFunction;
         }
         throw new RuntimeException("can't meeet: " + this.toString() + " and " + otherFunction.toString());

@@ -1,17 +1,17 @@
 package target.constant;
 
-public class Field {
+public class Field5 {
 
     int x;
     int y;
 
     /**
-     * Field loaded with constant
+     * field stored with field load
      */
     public void entryPoint() {
-        Field field = new Field();
+        Field5 field = new Field5();
         field.x = 100;
-        field.y = 200;
+        field.y = field.x;
     }
 
 }

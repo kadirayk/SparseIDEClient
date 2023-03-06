@@ -21,9 +21,9 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
-    protected final static Integer TOP = Integer.MIN_VALUE; // Unknown
+    public final static Integer TOP = Integer.MIN_VALUE; // Unknown
 
-    protected final static Integer BOTTOM = Integer.MAX_VALUE; // Not Constant
+    public final static Integer BOTTOM = Integer.MAX_VALUE; // Not Constant
 
 
     public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg) {

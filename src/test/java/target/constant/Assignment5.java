@@ -1,12 +1,14 @@
 package target.constant;
 
-public class SimpleAssignment6 {
+public class Assignment5 {
 
+    /**
+     * Assignment with overwrite
+     */
     public void entryPoint() {
         int a = 100;
         int b = 200;
-        a++;
-        b += 1;
+        a = 13;
     }
 
 }
