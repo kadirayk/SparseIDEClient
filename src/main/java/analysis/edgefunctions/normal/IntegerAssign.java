@@ -1,20 +1,25 @@
 package analysis.edgefunctions.normal;
 
-import analysis.IDELinearConstantAnalysisProblem;
+import analysis.AnalysisLogger;
+import analysis.edgefunctions.CPANormalEdgeFunctionProvider;
 import analysis.edgefunctions.IntegerAllBottom;
+import analysis.edgefunctions.LoggingEdgeFunction;
 import heros.EdgeFunction;
-import heros.edgefunc.AllBottom;
 import heros.edgefunc.EdgeIdentity;
+import org.slf4j.LoggerFactory;
 import soot.Value;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 
-public class IntegerAssign implements EdgeFunction<Integer> {
+public class IntegerAssign extends LoggingEdgeFunction<Integer> {
 
     private Integer value;
+    private AnalysisLogger analysisLogger;
 
-    public IntegerAssign(Integer value){
+    public IntegerAssign(Integer value, AnalysisLogger analysisLogger){
+        this.analysisLogger = analysisLogger;
         this.value = value;
+        setLogger();
     }
 
     public Integer getValue() {
@@ -22,7 +27,13 @@ public class IntegerAssign implements EdgeFunction<Integer> {
     }
 
     @Override
+    public void setLogger() {
+        log = LoggerFactory.getLogger(IntegerAssign.class);
+    }
+
+    @Override
     public Integer computeTarget(Integer integer) {
+        super.computeTarget(integer);
         return value;
     }
 
@@ -33,6 +44,7 @@ public class IntegerAssign implements EdgeFunction<Integer> {
      */
     @Override
     public EdgeFunction<Integer> composeWith(EdgeFunction<Integer> secondFunction) {
+        super.composeWith(secondFunction);
         if(secondFunction instanceof EdgeIdentity){
             return this;
         }else if(secondFunction instanceof IntegerAssign){
@@ -46,20 +58,22 @@ public class IntegerAssign implements EdgeFunction<Integer> {
                 int val = ((IntConstant) lop).value;
                 String op = binop.getSymbol();
                 int res = IntegerBinop.executeBinOperation(op, value, val);
-                return new IntegerAssign(res);
+                return new IntegerAssign(res, analysisLogger);
             }else if(rop instanceof IntConstant){
                 int val = ((IntConstant) rop).value;
                 String op = binop.getSymbol();
                 int res = IntegerBinop.executeBinOperation(op, value, val);
-                return new IntegerAssign(res);
+                return new IntegerAssign(res, analysisLogger);
             }
-            throw new RuntimeException("neither lop nor rop is constant");
+            analysisLogger.log();
+            throw new RuntimeException("neither lop nor rop is constant: " + this.getValue() + System.lineSeparator() + ((IntegerBinop) secondFunction).getBinop());
         }
         return this;
     }
 
     @Override
     public EdgeFunction<Integer> meetWith(EdgeFunction<Integer> otherFunction) {
+        super.meetWith(otherFunction);
         if(otherFunction instanceof EdgeIdentity){
             return this;
         }else if(otherFunction instanceof IntegerAssign){
@@ -68,10 +82,10 @@ public class IntegerAssign implements EdgeFunction<Integer> {
             if(valueFromOtherBranch==valueFromThisBranch){
                 return this;
             }else{
-                return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+                return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
             }
         }else if(otherFunction instanceof IntegerBinop){
-            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+            return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
         }else if(otherFunction instanceof IntegerAllBottom){
             return otherFunction;
         }
@@ -79,7 +93,8 @@ public class IntegerAssign implements EdgeFunction<Integer> {
     }
 
     @Override
-    public boolean equalTo(EdgeFunction<Integer> edgeFunction) {
-        return false;
+    public boolean equalTo(EdgeFunction<Integer> other) {
+        super.equalTo(other);
+        return this == other;
     }
 }

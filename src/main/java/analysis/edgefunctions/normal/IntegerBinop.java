@@ -2,6 +2,7 @@ package analysis.edgefunctions.normal;
 
 import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
+import analysis.edgefunctions.CPANormalEdgeFunctionProvider;
 import analysis.edgefunctions.IntegerAllBottom;
 import heros.EdgeFunction;
 import heros.edgefunc.EdgeIdentity;
@@ -59,6 +60,24 @@ public class IntegerBinop implements EdgeFunction<Integer> {
             case "%":
                 res = lhs % rhs;
                 break;
+            case "<<":
+                res = lhs << rhs;
+                break;
+            case ">>":
+                res = lhs >> rhs;
+                break;
+            case "^":
+                res = lhs ^ rhs;
+                break;
+            case "&":
+                res = lhs & rhs;
+                break;
+            case "|":
+                res = lhs | rhs;
+                break;
+            case ">>>":
+                res = lhs >>> rhs;
+                break;
             default:
                 throw new UnsupportedOperationException("Could not execute unknown operation '" + op + "'!");
         }
@@ -70,9 +89,9 @@ public class IntegerBinop implements EdgeFunction<Integer> {
         if(otherFunction instanceof EdgeIdentity){
             return this;
         }else if(otherFunction instanceof IntegerAssign){
-            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+            return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
         }else if(otherFunction instanceof IntegerBinop){
-            return new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+            return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
         }else if(otherFunction instanceof IntegerAllBottom){
             return otherFunction;
         }

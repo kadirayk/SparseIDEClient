@@ -6,15 +6,14 @@ import heros.sparse.SparseCFGBuilder;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
-import soot.jimple.BinopExpr;
-import soot.jimple.InvokeExpr;
-import soot.jimple.StaticFieldRef;
-import soot.jimple.Stmt;
+import soot.jimple.*;
 import soot.jimple.internal.*;
 import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.DirectedGraph;
+import util.CFGUtil;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -37,15 +36,10 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     @Override
     public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d) {
-
         DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
         JimpleSparseCFG cfg = new JimpleSparseCFG(d);
 
-        List<Unit> heads = graph.getHeads();
-        if (heads.size() > 1) {
-            throw new RuntimeException("Multiple heads");
-        }
-        Unit head = heads.get(0);
+        Unit head = CFGUtil.getHead(graph);
         //handle Source
         if (d.toString().equals("<<zero>>")) {
             buildCompleteCFG(head, graph, cfg);
@@ -57,6 +51,8 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
         //logInfo(cfg);
         return cfg;
     }
+
+
 
     /**
      * DFS traverse Original Graph and keep all the stmts

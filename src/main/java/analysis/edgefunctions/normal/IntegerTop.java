@@ -40,7 +40,7 @@ public class IntegerTop implements EdgeFunction<Integer> {
     }
 
     @Override
-    public boolean equalTo(EdgeFunction<Integer> edgeFunction) {
-        return false;
+    public boolean equalTo(EdgeFunction<Integer> other) {
+        return this==other;
     }
 }

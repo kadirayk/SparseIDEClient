@@ -68,7 +68,7 @@ public class SparseAliasManager {
 
         @Override
         public int analysisTimeoutMS() {
-            return Integer.MAX_VALUE;
+            return 1000;
         }
 
         @Override

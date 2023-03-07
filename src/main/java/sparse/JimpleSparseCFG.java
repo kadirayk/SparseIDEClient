@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import soot.Unit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,10 @@ public class JimpleSparseCFG implements SparseCFG<Unit, DFF> {
     }
 
     public Set<Unit> getSuccessors(Unit node){
-        return graph.successors(node);
+        if(graph.nodes().contains(node)){
+            return graph.successors(node);
+        }
+        return Collections.emptySet();
     }
 
     @Override

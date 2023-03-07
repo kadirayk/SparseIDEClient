@@ -12,6 +12,9 @@ import heros.flowfunc.Identity;
 import soot.*;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.ide.DefaultJimpleIDETabulationProblem;
+import soot.toolkits.graph.BriefUnitGraph;
+import soot.toolkits.graph.DirectedGraph;
+import util.CFGUtil;
 
 import java.util.Collections;
 import java.util.Map;
@@ -21,10 +24,18 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
+    private SootMethod entryMethod;
+
     public final static Integer TOP = Integer.MIN_VALUE; // Unknown
 
     public final static Integer BOTTOM = Integer.MAX_VALUE; // Not Constant
 
+
+    public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg, SootMethod entry) {
+        super(icfg);
+        this.icfg = icfg;
+        this.entryMethod = entry;
+    }
 
     public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg) {
         super(icfg);
@@ -105,7 +116,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
         return new EdgeFunctions<Unit, DFF, SootMethod, Integer>() {
             @Override
             public EdgeFunction<Integer> getNormalEdgeFunction(Unit src, DFF srcNode, Unit tgt, DFF tgtNode) {
-                CPANormalEdgeFunctionProvider efp = new CPANormalEdgeFunctionProvider(src, srcNode, tgtNode, zeroValue());
+                CPANormalEdgeFunctionProvider efp = new CPANormalEdgeFunctionProvider(icfg.getMethodOf(src), src, srcNode, tgtNode, zeroValue());
                 return efp.getEdgeFunction();
             }
 
@@ -133,17 +144,26 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     @Override
     public Map<Unit, Set<DFF>> initialSeeds() {
+        if(entryMethod!=null){
+            DirectedGraph<Unit> unitGraph = new BriefUnitGraph(entryMethod.getActiveBody());
+            return DefaultSeeds.make(Collections.singleton(CFGUtil.getHead(unitGraph)), zeroValue());
+        }
         for (SootClass c : Scene.v().getApplicationClasses()) {
             for (SootMethod m : c.getMethods()) {
                 if (!m.hasActiveBody()) {
                     continue;
                 }
                 if (m.getName().equals("entryPoint")) {
-                    return DefaultSeeds.make(Collections.singleton(m.getActiveBody().getUnits().getFirst()), zeroValue());
+                    DirectedGraph<Unit> unitGraph = new BriefUnitGraph(m.getActiveBody());
+                    SootMethod methodOf = icfg.getMethodOf(CFGUtil.getHead(unitGraph));
+                    System.out.println(methodOf.getActiveBody());
+                    return DefaultSeeds.make(Collections.singleton(CFGUtil.getHead(unitGraph)), zeroValue());
                 }
             }
         }
         throw new IllegalStateException("scene does not contain 'entryPoint'");
     }
+
+
 
 }

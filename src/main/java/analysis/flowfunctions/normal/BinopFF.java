@@ -33,7 +33,7 @@ public class BinopFF implements FlowFunction<DFF> {
         if (source == zeroValue) {
             return res;
         }
-        if (lop == source.getValue() && rop instanceof IntConstant || rop == source.getValue() && lop instanceof IntConstant) {
+        if ((lop == source.getValue() && rop instanceof IntConstant) || (rop == source.getValue() && lop instanceof IntConstant)) {
             res.add(DFF.asDFF(lhs));
             aliasHandler.handleAliases(res);
         }

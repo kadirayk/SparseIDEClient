@@ -51,7 +51,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
             protected void internalTransform(String phaseName, Map<String, String> options) {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
-                SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(true);
+                SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(false);
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                 solver.solve();
@@ -482,6 +482,29 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         expected.add(new Pair("a", 100));
         expected.add(new Pair("field.x", 100));
         expected.add(new Pair("alias.x", 100));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void NonLinear() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(NonLinear.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(NonLinear.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("a", 1));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void NonLinear2() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(NonLinear2.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(NonLinear2.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("i", IDELinearConstantAnalysisProblem.BOTTOM));
+        expected.add(new Pair("hashCode", IDELinearConstantAnalysisProblem.BOTTOM));
         checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 

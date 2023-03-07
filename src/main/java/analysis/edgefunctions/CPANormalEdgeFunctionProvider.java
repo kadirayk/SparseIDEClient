@@ -1,5 +1,6 @@
 package analysis.edgefunctions;
 
+import analysis.AnalysisLogger;
 import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
 import analysis.edgefunctions.normal.IntegerAssign;
@@ -7,6 +8,7 @@ import analysis.edgefunctions.normal.IntegerBinop;
 import heros.EdgeFunction;
 import heros.edgefunc.AllBottom;
 import heros.edgefunc.EdgeIdentity;
+import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.BinopExpr;
@@ -15,11 +17,11 @@ import soot.jimple.IntConstant;
 
 public class CPANormalEdgeFunctionProvider {
 
-    private final static EdgeFunction<Integer> ALL_BOTTOM = new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
+    public final static EdgeFunction<Integer> ALL_BOTTOM = new IntegerAllBottom(IDELinearConstantAnalysisProblem.BOTTOM);
 
     private EdgeFunction<Integer> edgeFunction;
 
-    public CPANormalEdgeFunctionProvider(Unit src, DFF srcNode, DFF tgtNode, DFF zeroValue){
+    public CPANormalEdgeFunctionProvider(SootMethod method, Unit src, DFF srcNode, DFF tgtNode, DFF zeroValue){
         edgeFunction = EdgeIdentity.v();
         if (srcNode == zeroValue && tgtNode == zeroValue) {
             edgeFunction = ALL_BOTTOM;
@@ -31,17 +33,30 @@ public class CPANormalEdgeFunctionProvider {
                 // check if lhs is the tgtNode we are looking at and if rhs is a constant integer
                 if (rhs instanceof IntConstant) {
                     IntConstant iconst = (IntConstant) rhs;
-                    edgeFunction = new IntegerAssign(iconst.value);
+                    edgeFunction = new IntegerAssign(iconst.value, new AnalysisLogger(method, src));
                 }
                 // check if rhs is a binary expression with known values
                 else if (rhs instanceof BinopExpr) {
                     BinopExpr binop = (BinopExpr) rhs;
-                    edgeFunction = new IntegerBinop(binop, srcNode);
+                    if(isLinearBinop(binop)){
+                        edgeFunction = new IntegerBinop(binop, srcNode);
+                    }
                 }
             }
         }
     }
 
+    /**
+     * one of the operands must be constant
+     */
+    public static boolean isLinearBinop(BinopExpr binop){
+        Value op1 = binop.getOp1();
+        Value op2 = binop.getOp2();
+        if(op1 instanceof IntConstant || op2 instanceof IntConstant){
+            return true;
+        }
+        return false;
+    }
 
     public EdgeFunction<Integer> getEdgeFunction(){
         return edgeFunction;
