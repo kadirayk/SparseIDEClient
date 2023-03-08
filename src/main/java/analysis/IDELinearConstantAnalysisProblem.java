@@ -24,17 +24,24 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
+    private int numThreads=-1;
+
     private SootMethod entryMethod;
 
     public final static Integer TOP = Integer.MIN_VALUE; // Unknown
 
     public final static Integer BOTTOM = Integer.MAX_VALUE; // Not Constant
 
+    @Override
+    public int numThreads() {
+        return numThreads!=-1 ? numThreads : super.numThreads();
+    }
 
-    public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg, SootMethod entry) {
+    public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg, SootMethod entry, int numThreads) {
         super(icfg);
         this.icfg = icfg;
         this.entryMethod = entry;
+        this.numThreads = numThreads;
     }
 
     public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg) {

@@ -1,3 +1,5 @@
+package eval;
+
 import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
 import boomerang.scene.jimple.BoomerangPretransformer;
@@ -24,7 +26,6 @@ public class SetUp {
 
     public long defaultPropCount = 0;
     public long sparsePropCount = 0;
-
 
     protected void executeStaticAnalysis(String jarPath) {
         setupSoot(jarPath);
@@ -63,8 +64,8 @@ public class SetUp {
             protected void internalTransform(String phaseName, Map<String, String> options) {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 for (SootMethod method : entryMethods) {
-                    System.out.println("solving " + method.getSignature());
-                    IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method);
+                    System.out.println("started solving from: " + method.getSignature());
+                    IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     @SuppressWarnings({"rawtypes", "unchecked"})
                     JimpleIDESolver<?, ?, ?> solver = new JimpleIDESolver<>(problem);
                     solver.solve();
@@ -81,7 +82,7 @@ public class SetUp {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 for (SootMethod method : entryMethods) {
                     System.out.println("sparse solving " + method.getSignature());
-                    IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method);
+                    IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(true);
                     @SuppressWarnings({"rawtypes", "unchecked"})
                     JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
@@ -134,6 +135,7 @@ public class SetUp {
 
     protected List<SootMethod> getEntryPointMethods() {
         List<SootMethod> methods = new ArrayList<>();
+        l1:
         for (SootClass c : Scene.v().getApplicationClasses()) {
             for (SootMethod m : c.getMethods()) {
                 MethodSource source = m.getSource();
@@ -141,7 +143,7 @@ public class SetUp {
                     if(isPublicAPI(m)){
                         m.retrieveActiveBody();
                         if (m.hasActiveBody()) {
-                            if(m.getParameterTypes().stream().anyMatch(t->t instanceof IntegerType && !t.equals(BooleanType.v()))){
+                            if(m.getReturnType() instanceof IntegerType && m.getParameterTypes().stream().anyMatch(t->t instanceof IntegerType && !t.equals(BooleanType.v()))){
                                 UnitPatchingChain units = m.getActiveBody().getUnits();
                                 for (Unit unit : units) {
                                     if(unit instanceof DefinitionStmt){
@@ -149,6 +151,9 @@ public class SetUp {
                                         Value rhs = assign.getRightOp();
                                         if(rhs instanceof IntConstant ){
                                             methods.add(m);
+                                            if(methods.size()==EvalHelper.getMaxMethod()){
+                                                break l1;
+                                            }
                                         }
                                     }
                                 }
@@ -160,6 +165,7 @@ public class SetUp {
         }
         if(!methods.isEmpty()){
             System.out.println(methods.size() + " methods will be used as entry points");
+            EvalHelper.setActualMethodCount(methods.size());
             return methods;
         }
         throw new RuntimeException("no entry methods found to start");

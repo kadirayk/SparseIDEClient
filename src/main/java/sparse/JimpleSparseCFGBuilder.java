@@ -4,6 +4,7 @@ import aliasing.AliasManager;
 import analysis.data.DFF;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
+import heros.sparse.SparseCFGQueryStat;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
@@ -36,8 +37,7 @@ public class JimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMethod
 
 
     @Override
-    public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d) {
-
+    public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d, SparseCFGQueryStat queryStat) {
         DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
         JimpleSparseCFG cfg = new JimpleSparseCFG(d);
 

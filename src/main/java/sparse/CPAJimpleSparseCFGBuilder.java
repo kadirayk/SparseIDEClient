@@ -3,6 +3,7 @@ package sparse;
 import analysis.data.DFF;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
+import heros.sparse.SparseCFGQueryStat;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
@@ -35,19 +36,29 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
 
     @Override
-    public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d) {
+    public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d, SparseCFGQueryStat queryStat) {
         DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
+        int initialSize = graph.size();
         JimpleSparseCFG cfg = new JimpleSparseCFG(d);
 
         Unit head = CFGUtil.getHead(graph);
         //handle Source
         if (d.toString().equals("<<zero>>")) {
             buildCompleteCFG(head, graph, cfg);
+            int finalSize = cfg.getGraph().nodes().size();
+            if(initialSize!=finalSize){
+                throw new RuntimeException("Sth is wrong!");
+            }
+            queryStat.setInitialStmtCount(initialSize);
+            queryStat.setFinalStmtCount(finalSize);
             return cfg;
         }
 
         //buildCompleteCFG(head, graph, cfg);
         buildSparseCFG(head, null, graph, cfg, d, m);
+        int finalSize = cfg.getGraph().nodes().size();
+        queryStat.setInitialStmtCount(initialSize);
+        queryStat.setFinalStmtCount(finalSize);
         //logInfo(cfg);
         return cfg;
     }
