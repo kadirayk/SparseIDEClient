@@ -12,16 +12,15 @@ import soot.SootMethod;
 import soot.Unit;
 import util.SortableCSVString;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod>> extends SparseIDESolver<Unit, D, SootMethod, V, I> {
     private static final Logger logger = LoggerFactory.getLogger(JimpleSparseIDESolver.class);
+
+    private static final String OUT_PUT_DIR = "./out";
 
     public JimpleSparseIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
         super(problem, sparseCFGBuilder);
@@ -32,46 +31,49 @@ public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, Soot
         this.dumpResults(targetClassName);
     }
 
-    public void dumpResults(String targetClassName) {
-        try {
-            String fileName = targetClassName==null || targetClassName.isEmpty() ? "ideSolverDump" : targetClassName;
-            PrintWriter out = new PrintWriter(new FileOutputStream("out/sparse-" + fileName + "-" + System.currentTimeMillis()%10000 + ".csv"));
-            List<SortableCSVString> res = new ArrayList();
-            Iterator var3 = this.val.cellSet().iterator();
+    private static Map<String, Set<String>> checkedMethods = new TreeMap<>();
 
-            while(var3.hasNext()) {
-                Table.Cell<Unit, D, ?> entry = (Table.Cell)var3.next();
-                SootMethod methodOf = this.icfg.getMethodOf(entry.getRowKey());
-                PatchingChain<Unit> units = methodOf.getActiveBody().getUnits();
-                int i = 0;
-                Iterator var8 = units.iterator();
-
-                while(true) {
-                    if (var8.hasNext()) {
-                        Unit unit = (Unit) var8.next();
-                        if (unit != entry.getRowKey()) {
-                            ++i;
-                            continue;
-                        }
-                    }
-
-                    res.add(new SortableCSVString(methodOf + ";" + entry.getRowKey() + "@" + i + ";" + entry.getColumnKey() + ";" + entry.getValue(), i));
-                    break;
+    public void addFinalResults(String entryMethod) {
+        Iterator iter = this.val.cellSet().iterator();
+        while (iter.hasNext()) {
+            Table.Cell<Unit, D, ?> entry = (Table.Cell) iter.next();
+            SootMethod method = this.icfg.getMethodOf(entry.getRowKey());
+            if (checkedMethods.containsKey(method.getSignature())) {
+                continue;
+            }
+            Unit lastStmt = method.getActiveBody().getUnits().getLast();
+            Set<String> results = new TreeSet<>();
+            Map<D, V> res = this.resultsAt(lastStmt);
+            for (Map.Entry<D, V> e : res.entrySet()) {
+                if(!e.getKey().toString().contains("$stack") && !e.getKey().toString().contains("varReplacer")){
+                    results.add(e.getKey().toString() + " - " + e.getValue());
                 }
             }
-
-            Collections.sort(res);
-            var3 = res.iterator();
-
-            while(var3.hasNext()) {
-                SortableCSVString string = (SortableCSVString)var3.next();
-                out.println(string.value.replace("\"", "'"));
+            if(!results.isEmpty()){
+                if(method.getSignature().contains("com.google.common.base.Joiner$3")){
+                    System.out.println(entryMethod);
+                }
+                checkedMethods.put(method.getSignature(), results);
             }
+        }
+    }
 
-            out.flush();
-            out.close();
-        } catch (FileNotFoundException var10) {
-            logger.error(var10.getMessage(), var10);
+    public void dumpResults(String targetClassName) {
+        File dir = new File(OUT_PUT_DIR);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        File file = new File(OUT_PUT_DIR + File.separator + "sparse-" + targetClassName + ".csv");
+        try (FileWriter writer = new FileWriter(file, true)) {
+            for (String key : checkedMethods.keySet()) {
+                for (String res : checkedMethods.get(key)) {
+                    String str = key + ";" + res + System.lineSeparator();
+                    writer.write(str);
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

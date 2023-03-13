@@ -24,9 +24,9 @@ public class EvalPrinter {
     private float finalStmtCount = 0;
 
 
-    public EvalPrinter(String targetProgram, String solver) {
-        this.targetProgram = targetProgram;
+    public EvalPrinter(String solver) {
         this.solver = solver;
+        this.targetProgram = EvalHelper.getTargetName();
         this.threadCount = EvalHelper.getThreadCount();
         this.totalDuration = EvalHelper.getTotalDuration();
         this.totalPropagationCount = EvalHelper.getTotalPropagationCount();

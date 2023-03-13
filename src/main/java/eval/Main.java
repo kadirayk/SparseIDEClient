@@ -8,6 +8,10 @@ import java.time.Duration;
 
 public class Main {
 
+    /**
+     * Run with args: "input/maventop/guava-18.0.jar" sparse 10 1
+     * @param args
+     */
     public static void main(String[] args){
         String jarPath = args[0]; // path to input jar
         String solver = args[1]; // solver: default or sparse
@@ -17,11 +21,11 @@ public class Main {
             numThreads = Integer.parseInt(args[3]); // thread count
         }
 
-
-        String msg = MessageFormat.format("Running {0} - {1} solver - {2} threads", getJarName(jarPath), solver, numThreads);
-        System.out.println(msg);
-        EvalHelper.setMaxMethod(10);
+        EvalHelper.setTargetName(getJarName(jarPath));
+        EvalHelper.setMaxMethod(maxMethods);
         EvalHelper.setThreadCount(numThreads);
+        String msg = MessageFormat.format("Running {0} - {1} solver - {2} threads", EvalHelper.getTargetName(), solver, numThreads);
+        System.out.println(msg);
 
         SetUp setUp = new SetUp();
         Stopwatch stopwatch = Stopwatch.createStarted();
@@ -34,7 +38,7 @@ public class Main {
         }
         Duration elapsed = stopwatch.elapsed();
         EvalHelper.setTotalDuration(elapsed.toMillis());
-        new EvalPrinter(getJarName(jarPath), solver).generate();
+        new EvalPrinter(solver).generate();
     }
 
     private static String getJarName(String fullpath){

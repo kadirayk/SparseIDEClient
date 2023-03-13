@@ -67,10 +67,13 @@ public class SetUp {
                     System.out.println("started solving from: " + method.getSignature());
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     @SuppressWarnings({"rawtypes", "unchecked"})
-                    JimpleIDESolver<?, ?, ?> solver = new JimpleIDESolver<>(problem);
-                    solver.solve();
-                    getResult(solver, method);
+                    JimpleIDESolver<?, ?, ?> mSolver = new JimpleIDESolver<>(problem);
+                    mSolver.solve();
+                    solver = mSolver;
+                    mSolver.addFinalResults(method.getSignature());
+                    getResult(mSolver, method);
                 }
+                solver.dumpResults(EvalHelper.getTargetName());
             }
         };
     }
@@ -85,10 +88,13 @@ public class SetUp {
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(true);
                     @SuppressWarnings({"rawtypes", "unchecked"})
-                    JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
-                    solver.solve();
-                    getResult(solver, method);
+                    JimpleSparseIDESolver<?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
+                    mSolver.solve();
+                    sparseSolver = mSolver;
+                    mSolver.addFinalResults(method.toString());
+                    getResult(mSolver, method);
                 }
+                sparseSolver.dumpResults(EvalHelper.getTargetName());
             }
         };
     }

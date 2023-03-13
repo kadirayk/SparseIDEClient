@@ -53,15 +53,6 @@ public class JimpleSparseCFG implements SparseCFG<Unit, DFF> {
         return this.d;
     }
 
-    @Override
-    public List<Unit> getCFG() {
-        return null;
-    }
-
-    @Override
-    public void setCFG(List<Unit> cfg) {
-
-    }
 
     public MutableGraph<Unit>  getGraph(){
         return this.graph;

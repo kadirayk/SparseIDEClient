@@ -1,9 +1,12 @@
 package sparse;
 
 import analysis.data.DFF;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
 import heros.sparse.SparseCFGQueryStat;
+import soot.Body;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
@@ -16,7 +19,9 @@ import util.CFGUtil;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Value is the type of DFF
@@ -30,6 +35,8 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     private boolean enableExceptions;
 
+    private boolean log = false;
+
     public CPAJimpleSparseCFGBuilder(boolean enableExceptions) {
         this.enableExceptions = enableExceptions;
     }
@@ -37,6 +44,8 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     @Override
     public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d, SparseCFGQueryStat queryStat) {
+        log = m.getSignature().contains("com.google.common.base.Joiner$3");
+
         DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
         int initialSize = graph.size();
         JimpleSparseCFG cfg = new JimpleSparseCFG(d);
@@ -45,24 +54,23 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
         //handle Source
         if (d.toString().equals("<<zero>>")) {
             buildCompleteCFG(head, graph, cfg);
+            logCFG(LOGGER, cfg.getGraph(), "original", m.getActiveBody(), cfg.getD());
             int finalSize = cfg.getGraph().nodes().size();
-            if(initialSize!=finalSize){
-                throw new RuntimeException("Sth is wrong!");
-            }
+            // we pick the non identity head
             queryStat.setInitialStmtCount(initialSize);
             queryStat.setFinalStmtCount(finalSize);
             return cfg;
         }
 
-        //buildCompleteCFG(head, graph, cfg);
-        buildSparseCFG(head, null, graph, cfg, d, m);
+        buildCompleteCFG(head, graph, cfg);
+        //buildSparseCFG(head, null, graph, cfg, d, m);
         int finalSize = cfg.getGraph().nodes().size();
         queryStat.setInitialStmtCount(initialSize);
         queryStat.setFinalStmtCount(finalSize);
         //logInfo(cfg);
+        logCFG(LOGGER, cfg.getGraph(), "sparse", m.getActiveBody(), cfg.getD());
         return cfg;
     }
-
 
 
     /**
@@ -121,7 +129,7 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
     private boolean shouldKeepStmt(Unit unit, DFF d, SootMethod m, DirectedGraph<Unit> graph) {
 
         //keep the stmt which generates the D
-        if (d.getGeneratedAt()!=null && unit.toString().equals(d.getGeneratedAt().toString())) {
+        if (d.getGeneratedAt() != null && unit.toString().equals(d.getGeneratedAt().toString())) {
             // TODO: would this be a problem?
             return true;
         }
@@ -186,18 +194,18 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
             }
 
             if (d.equals(left) || d.equals(right)) {
-                if(rightOp instanceof InvokeExpr){
+                if (rightOp instanceof InvokeExpr) {
                     addedInvoke = true;
                 }
                 return true;
-            } else if(rightOp instanceof BinopExpr){
-                    BinopExpr binop = (BinopExpr) rightOp;
-                    Value lop = binop.getOp1();
-                    Value rop = binop.getOp2();
-                    if(DFF.asDFF(lop).equals(d) || DFF.asDFF(rop).equals(d)){
-                        return true;
-                    }
-            }else {
+            } else if (rightOp instanceof BinopExpr) {
+                BinopExpr binop = (BinopExpr) rightOp;
+                Value lop = binop.getOp1();
+                Value rop = binop.getOp2();
+                if (DFF.asDFF(lop).equals(d) || DFF.asDFF(rop).equals(d)) {
+                    return true;
+                }
+            } else {
                 // field case (Case 2: handled here)
                 if (d.getRemainingFields(right) != null) {
                     return true;
@@ -269,17 +277,17 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
     }
 
     private boolean keepControlFlowStmts(Unit stmt, DirectedGraph<Unit> graph) {
-        if (stmt instanceof JIfStmt || stmt instanceof JNopStmt || stmt instanceof JGotoStmt || stmt instanceof JReturnStmt || stmt instanceof JReturnVoidStmt) {
+        if (stmt instanceof JIfStmt || stmt instanceof JNopStmt || stmt instanceof JGotoStmt || stmt instanceof JReturnStmt || stmt instanceof JReturnVoidStmt || stmt instanceof JIdentityStmt) {
             return true;
         }
-        if (stmt instanceof JIdentityStmt) {
-            JIdentityStmt id = (JIdentityStmt) stmt;
-            if (id.getRightOp() instanceof JCaughtExceptionRef) {
-                return true;
-            }
-        }
+//        if (stmt instanceof JIdentityStmt) {
+//            JIdentityStmt id = (JIdentityStmt) stmt;
+//            if (id.getRightOp() instanceof JCaughtExceptionRef) {
+//                return true;
+//            }
+//        }
         // or if stmt has multiple successors
-        if(graph.getSuccsOf(stmt).size()>1){
+        if (graph.getSuccsOf(stmt).size() > 1) {
             return true;
         }
         return false;
@@ -318,9 +326,13 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
     }
 
 
-    private void logInfo(JimpleSparseCFG sparseCFG) {
-        String str = sparseCFG.getGraph().edges().toString();
-        LOGGER.info(MessageFormat.format("SparseCFG for {0}: {1}", sparseCFG.getD(), str));
+    private void logCFG(Logger logger, MutableGraph<Unit> graph, String cfgType, Body body, DFF d) {
+        if (log) {
+            logger.info(cfgType + "-" + d.toString() +  ":\n" +
+                    graph.nodes().stream()
+                            .map(Objects::toString)
+                            .collect(Collectors.joining(System.lineSeparator())) + "\n" + body.toString());
+        }
     }
 
 }

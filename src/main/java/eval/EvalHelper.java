@@ -2,6 +2,7 @@ package eval;
 
 public class EvalHelper {
 
+    private static String targetName;
     private static int threadCount = -1;
     private static int maxMethod = -1;
     private static long totalDuration = 0;
@@ -47,5 +48,13 @@ public class EvalHelper {
 
     public static void setMaxMethod(int maxMethod) {
         EvalHelper.maxMethod = maxMethod;
+    }
+
+    public static String getTargetName() {
+        return targetName;
+    }
+
+    public static void setTargetName(String targetName) {
+        EvalHelper.targetName = targetName;
     }
 }
