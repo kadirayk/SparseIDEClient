@@ -163,7 +163,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                 if (m.getName().equals("entryPoint")) {
                     DirectedGraph<Unit> unitGraph = new BriefUnitGraph(m.getActiveBody());
                     SootMethod methodOf = icfg.getMethodOf(CFGUtil.getHead(unitGraph));
-                    System.out.println(methodOf.getActiveBody());
+                    //System.out.println(methodOf.getActiveBody());
                     return DefaultSeeds.make(Collections.singleton(CFGUtil.getHead(unitGraph)), zeroValue());
                 }
             }

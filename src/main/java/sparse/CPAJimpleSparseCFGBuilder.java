@@ -3,6 +3,7 @@ package sparse;
 import analysis.data.DFF;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.google.common.graph.Traverser;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
 import heros.sparse.SparseCFGQueryStat;
@@ -17,9 +18,7 @@ import soot.toolkits.graph.DirectedGraph;
 import util.CFGUtil;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -46,30 +45,81 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
     public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d, SparseCFGQueryStat queryStat) {
         log = m.getSignature().contains("com.google.common.base.Joiner$3");
 
-        DirectedGraph<Unit> graph = new BriefUnitGraph(m.getActiveBody());
-        int initialSize = graph.size();
-        JimpleSparseCFG cfg = new JimpleSparseCFG(d);
+        DirectedGraph<Unit> rawGraph = new BriefUnitGraph(m.getActiveBody());
+        List<Unit> heads = rawGraph.getHeads();
+        MutableGraph<Unit> mCFG = convertToMutableGraph(rawGraph);
 
-        Unit head = CFGUtil.getHead(graph);
+        queryStat.setInitialStmtCount(mCFG.nodes().size());
+        queryStat.setInitialEdgeCount(mCFG.edges().size());
+
+        Unit head = CFGUtil.getHead(rawGraph);
         //handle Source
         if (d.toString().equals("<<zero>>")) {
-            buildCompleteCFG(head, graph, cfg);
-            logCFG(LOGGER, cfg.getGraph(), "original", m.getActiveBody(), cfg.getD());
-            int finalSize = cfg.getGraph().nodes().size();
-            // we pick the non identity head
-            queryStat.setInitialStmtCount(initialSize);
-            queryStat.setFinalStmtCount(finalSize);
-            return cfg;
+            queryStat.setFinalStmtCount(mCFG.nodes().size());
+            queryStat.setFinalEdgeCount(mCFG.edges().size());
+            return new JimpleSparseCFG(d, mCFG);
         }
 
-        buildCompleteCFG(head, graph, cfg);
-        //buildSparseCFG(head, null, graph, cfg, d, m);
-        int finalSize = cfg.getGraph().nodes().size();
-        queryStat.setInitialStmtCount(initialSize);
-        queryStat.setFinalStmtCount(finalSize);
+        sparsify(mCFG, heads, d, m, rawGraph);
+
+        //buildSparseCFG(head, null, rawGraph, cfg, d, m);
+        queryStat.setFinalStmtCount(mCFG.nodes().size());
+        queryStat.setFinalEdgeCount(mCFG.edges().size());
         //logInfo(cfg);
-        logCFG(LOGGER, cfg.getGraph(), "sparse", m.getActiveBody(), cfg.getD());
-        return cfg;
+        return new JimpleSparseCFG(d, mCFG);
+    }
+
+    private void sparsify(MutableGraph<Unit> mCFG, List<Unit> heads, DFF d, SootMethod m, DirectedGraph<Unit> graph) {
+        Set<Unit> stmsToRemove = new HashSet<>();
+        for (Unit head : heads) {
+            Iterator<Unit> iter = getBFSIterator(mCFG, head);
+            while (iter.hasNext()) {
+                Unit unit = iter.next();
+                if (!stmsToRemove.contains(unit) && !shouldKeepStmt(unit, d, m, graph)) {
+                    stmsToRemove.add(unit);
+                }
+            }
+        }
+        for (Unit unit : stmsToRemove) {
+            Set<Unit> preds = mCFG.predecessors(unit);
+            Set<Unit> succs = mCFG.successors(unit);
+            if (preds.size() == 1 && succs.size() == 1) {
+                // we do this to be safe, but one can investigate removing multiple edges
+                mCFG.removeNode(unit);
+                mCFG.putEdge(preds.iterator().next(), succs.iterator().next());
+            }
+        }
+    }
+
+    protected Iterator<Unit> getBFSIterator(MutableGraph<Unit> graph, Unit head) {
+        Traverser<Unit> traverser = Traverser.forGraph(graph);
+        return traverser.breadthFirst(head).iterator();
+    }
+
+
+    protected MutableGraph<Unit> convertToMutableGraph(DirectedGraph<Unit> rawGraph) {
+        int initialSize = rawGraph.size();
+        MutableGraph<Unit> mGraph = GraphBuilder.directed().build();
+        List<Unit> heads = rawGraph.getHeads();
+        for (Unit head : heads) {
+            addToMutableGraph(rawGraph, head, mGraph);
+        }
+        int finalSize = mGraph.nodes().size();
+        if (initialSize != finalSize) {
+            throw new RuntimeException("Graph size differs after conversion to mutable graph");
+        }
+        return mGraph;
+    }
+
+    protected void addToMutableGraph(
+            DirectedGraph<Unit> graph, Unit curr, MutableGraph<Unit> mutableGraph) {
+        List<Unit> succsOf = graph.getSuccsOf(curr);
+        for (Unit succ : succsOf) {
+            if (!mutableGraph.hasEdgeConnecting(curr, succ) && !curr.equals(succ)) {
+                mutableGraph.putEdge(curr, succ);
+                addToMutableGraph(graph, succ, mutableGraph);
+            }
+        }
     }
 
 
@@ -130,7 +180,6 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
         //keep the stmt which generates the D
         if (d.getGeneratedAt() != null && unit.toString().equals(d.getGeneratedAt().toString())) {
-            // TODO: would this be a problem?
             return true;
         }
 
@@ -138,9 +187,6 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
         if (keepForCase1(unit, d, m)) {
             return true;
         }
-
-        // case 2: if stmt refers to v alone or v.f (instance field) handled in case 1
-        //handleCase2(stmt, sparseCFG);
 
         // case 3: if stmt accesses T.f (static field) or is a callsite
         if (keepForCase3(unit, d)) {
@@ -328,7 +374,7 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     private void logCFG(Logger logger, MutableGraph<Unit> graph, String cfgType, Body body, DFF d) {
         if (log) {
-            logger.info(cfgType + "-" + d.toString() +  ":\n" +
+            logger.info(cfgType + "-" + d.toString() + ":\n" +
                     graph.nodes().stream()
                             .map(Objects::toString)
                             .collect(Collectors.joining(System.lineSeparator())) + "\n" + body.toString());

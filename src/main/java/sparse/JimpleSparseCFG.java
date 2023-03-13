@@ -21,9 +21,9 @@ public class JimpleSparseCFG implements SparseCFG<Unit, DFF> {
     private MutableGraph<Unit> graph;
     private DFF d; // which dff this SCFG belongs to
 
-    public JimpleSparseCFG(DFF d) {
+    public JimpleSparseCFG(DFF d, MutableGraph<Unit> graph) {
         this.d = d;
-        this.graph = GraphBuilder.directed().build();
+        this.graph = graph;
     }
 
     public synchronized boolean addEdge(Unit node, Unit succ){

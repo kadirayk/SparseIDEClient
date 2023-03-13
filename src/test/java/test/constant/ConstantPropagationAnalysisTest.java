@@ -438,7 +438,6 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
     public void Field4() {
         JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        defaultIDEResult.forEach(System.out::println);
         JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
