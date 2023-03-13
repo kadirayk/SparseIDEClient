@@ -18,7 +18,7 @@ public class IntegerBinop implements EdgeFunction<Integer> {
     private String op;
     private BinopExpr binop;
 
-    public IntegerBinop(BinopExpr binop, DFF srcNode){
+    public IntegerBinop(BinopExpr binop, DFF srcNode) {
         this.binop = binop;
         this.srcNode = srcNode;
         lop = binop.getOp1();
@@ -43,6 +43,9 @@ public class IntegerBinop implements EdgeFunction<Integer> {
     }
 
     public static int executeBinOperation(String op, int lhs, int rhs) {
+        if(lhs == IDELinearConstantAnalysisProblem.BOTTOM || rhs == IDELinearConstantAnalysisProblem.BOTTOM){
+            return IDELinearConstantAnalysisProblem.BOTTOM;
+        }
         int res;
         switch (op.trim()) {
             case "+":
@@ -86,13 +89,13 @@ public class IntegerBinop implements EdgeFunction<Integer> {
 
     @Override
     public EdgeFunction<Integer> meetWith(EdgeFunction otherFunction) {
-        if(otherFunction instanceof EdgeIdentity){
+        if (otherFunction instanceof EdgeIdentity) {
             return this;
-        }else if(otherFunction instanceof IntegerAssign){
+        } else if (otherFunction instanceof IntegerAssign) {
             return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
-        }else if(otherFunction instanceof IntegerBinop){
+        } else if (otherFunction instanceof IntegerBinop) {
             return CPANormalEdgeFunctionProvider.ALL_BOTTOM;
-        }else if(otherFunction instanceof IntegerAllBottom){
+        } else if (otherFunction instanceof IntegerAllBottom) {
             return otherFunction;
         }
         throw new RuntimeException("can't meeet: " + this.toString() + " and " + otherFunction.toString());
@@ -100,30 +103,16 @@ public class IntegerBinop implements EdgeFunction<Integer> {
 
     @Override
     public EdgeFunction composeWith(EdgeFunction secondFunction) {
-        if(secondFunction instanceof EdgeIdentity){
+        if (secondFunction instanceof EdgeIdentity) {
             return this;
-        }else if(secondFunction instanceof IntegerAssign){
+        } else if (secondFunction instanceof IntegerAssign) {
             return secondFunction;
         }
         return this;
-    }
-
-    private int getIntVal(BinopExpr binop){
-        Value lop = binop.getOp1();
-        Value rop = binop.getOp2();
-        if(lop instanceof IntConstant){
-            return ((IntConstant) lop).value;
-        }else{
-            return ((IntConstant) rop).value;
-        }
-    }
-
-    public DFF getSrcNode(){
-        return srcNode;
     }
 
     @Override
     public boolean equalTo(EdgeFunction other) {
         return this == other;
     }
-    }
+}
