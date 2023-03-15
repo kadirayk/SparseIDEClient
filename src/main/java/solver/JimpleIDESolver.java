@@ -48,9 +48,6 @@ public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod
                 }
             }
             if(!results.isEmpty()){
-                if(method.getSignature().contains("com.google.common.base.Joiner$3") && method.getSignature().contains("get(")){
-                    System.out.println(entryMethod);
-                }
                 checkedMethods.put(method.getSignature(), results);
             }
         }

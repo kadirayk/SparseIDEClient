@@ -50,9 +50,6 @@ public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, Soot
                 }
             }
             if(!results.isEmpty()){
-                if(method.getSignature().contains("com.google.common.base.Joiner$3")){
-                    System.out.println(entryMethod);
-                }
                 checkedMethods.put(method.getSignature(), results);
             }
         }

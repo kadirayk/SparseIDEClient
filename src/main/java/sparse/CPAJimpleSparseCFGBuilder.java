@@ -43,7 +43,7 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     @Override
     public SparseCFG<Unit, DFF> buildSparseCFG(SootMethod m, DFF d, SparseCFGQueryStat queryStat) {
-        log = m.getSignature().contains("com.google.common.base.Joiner$3");
+        //log = m.getSignature().contains("com.google.common.util.concurrent.ExecutionList: void execute()");
 
         DirectedGraph<Unit> rawGraph = new BriefUnitGraph(m.getActiveBody());
         List<Unit> heads = rawGraph.getHeads();
@@ -52,20 +52,20 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
         queryStat.setInitialStmtCount(mCFG.nodes().size());
         queryStat.setInitialEdgeCount(mCFG.edges().size());
 
-        Unit head = CFGUtil.getHead(rawGraph);
         //handle Source
         if (d.toString().equals("<<zero>>")) {
             queryStat.setFinalStmtCount(mCFG.nodes().size());
             queryStat.setFinalEdgeCount(mCFG.edges().size());
+            logCFG(LOGGER, mCFG, "original", m.getActiveBody(), d);
             return new JimpleSparseCFG(d, mCFG);
         }
 
+
         sparsify(mCFG, heads, d, m, rawGraph);
 
-        //buildSparseCFG(head, null, rawGraph, cfg, d, m);
         queryStat.setFinalStmtCount(mCFG.nodes().size());
         queryStat.setFinalEdgeCount(mCFG.edges().size());
-        //logInfo(cfg);
+        logCFG(LOGGER, mCFG, "sparse", m.getActiveBody(), d);
         return new JimpleSparseCFG(d, mCFG);
     }
 
@@ -87,6 +87,9 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
                 // we do this to be safe, but one can investigate removing multiple edges
                 mCFG.removeNode(unit);
                 mCFG.putEdge(preds.iterator().next(), succs.iterator().next());
+                if(log){
+                    System.out.println("removing: " + unit + " for " + d + " in " + m.getSignature());
+                }
             }
         }
     }

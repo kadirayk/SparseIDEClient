@@ -113,7 +113,7 @@ public class SetUp {
         // We want to perform a whole program, i.e. an interprocedural analysis.
         // We construct a basic CHA call graph for the program
         Options.v().set_whole_program(true);
-        Options.v().setPhaseOption("cg.cha", "on");
+        Options.v().setPhaseOption("cg.spark", "on");
         Options.v().setPhaseOption("cg", "all-reachable:true");
 
         Options.v().set_no_bodies_for_excluded(true);
