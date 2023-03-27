@@ -156,7 +156,7 @@ public class SetUp {
                     if(isPublicAPI(m)){
                         m.retrieveActiveBody();
                         if (m.hasActiveBody()) {
-                            if(m.getSignature().contains("normalizeDocument")){
+                            //if(m.getSignature().contains("normalizeDocument")){
                             //if(m.getReturnType() instanceof IntegerType && m.getParameterTypes().stream().anyMatch(t->t instanceof IntegerType && !t.equals(BooleanType.v()))){
                                 UnitPatchingChain units = m.getActiveBody().getUnits();
                                 for (Unit unit : units) {
@@ -171,7 +171,7 @@ public class SetUp {
                                         }
                                     }
                                 }
-                            }
+                            //}
                         }
                     }
                 }
