@@ -5,6 +5,7 @@ import heros.FlowFunction;
 import soot.Value;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
+import sparse.IDSparseCFGBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +38,7 @@ public class BinopFF implements FlowFunction<DFF> {
             res.add(DFF.asDFF(lhs));
             aliasHandler.handleAliases(res);
         }
+        IDSparseCFGBuilder.keepStmt(aliasHandler.getMethod(), aliasHandler.getStmt(), res, source);
         return res;
     }
 }

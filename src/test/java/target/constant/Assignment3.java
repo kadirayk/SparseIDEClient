@@ -8,7 +8,7 @@ public class Assignment3 {
     public void entryPoint() {
         int a = 100;
         int b = 200;
-        int c = a * 4;
+        int c = a; // * 4;
     }
 
 }

@@ -15,18 +15,15 @@ import soot.jimple.internal.JInstanceFieldRef;
 import java.util.Collections;
 import java.util.Set;
 
-public class FieldStoreAliasHandler implements AliasHandler {
+public class FieldStoreAliasHandler extends AliasHandler {
 
     private JInstanceFieldRef fieldRef;
-    private Unit curr;
-    private SootMethod method;
 
     public FieldStoreAliasHandler(SootMethod method, Unit curr, Value lhs) {
+        super(method, curr);
         if(lhs instanceof JInstanceFieldRef){
             this.fieldRef = (JInstanceFieldRef) lhs;
         }
-        this.curr = curr;
-        this.method = method;
     }
 
 
@@ -47,5 +44,4 @@ public class FieldStoreAliasHandler implements AliasHandler {
             }
         }
     }
-
 }

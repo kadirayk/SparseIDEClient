@@ -5,6 +5,7 @@ import heros.FlowFunction;
 import soot.Value;
 import soot.jimple.FieldRef;
 import soot.jimple.internal.JInstanceFieldRef;
+import sparse.IDSparseCFGBuilder;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ public class FieldLoadFF implements FlowFunction<DFF> {
             res.add(DFF.asDFF(lhs));
             aliasHandler.handleAliases(res);
         }
+        IDSparseCFGBuilder.keepStmt(aliasHandler.getMethod(), aliasHandler.getStmt(), res, source);
         return res;
     }
 }

@@ -24,6 +24,8 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
+    private boolean isSparse;
+
     private int numThreads=-1;
 
     private SootMethod entryMethod;
@@ -41,7 +43,7 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
         super(icfg);
         this.icfg = icfg;
         this.entryMethod = entry;
-        this.numThreads = numThreads;
+        this.isSparse = false;
     }
 
     public IDELinearConstantAnalysisProblem(InterproceduralCFG<Unit, SootMethod> icfg) {

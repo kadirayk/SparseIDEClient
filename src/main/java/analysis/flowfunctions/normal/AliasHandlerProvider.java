@@ -14,8 +14,7 @@ public class AliasHandlerProvider {
         } else if (lhs instanceof JArrayRef) {
             return new ArrayStoreAliasHandler(method, curr, lhs);
         } else {
-            return new AliasHandler() {
-            };
+            return new AliasHandler(method, curr);
         }
     }
 

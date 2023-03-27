@@ -14,18 +14,15 @@ import soot.jimple.internal.JArrayRef;
 
 import java.util.Set;
 
-public class ArrayStoreAliasHandler implements AliasHandler {
+public class ArrayStoreAliasHandler extends AliasHandler {
 
     private JArrayRef arrayRef;
-    private Unit curr;
-    private SootMethod method;
 
     public ArrayStoreAliasHandler(SootMethod method, Unit curr, Value lhs) {
+        super(method, curr);
         if (lhs instanceof JArrayRef) {
             this.arrayRef = (JArrayRef) lhs;
         }
-        this.curr = curr;
-        this.method = method;
     }
 
     @Override

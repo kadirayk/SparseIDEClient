@@ -7,6 +7,7 @@ import soot.SootFieldRef;
 import soot.Value;
 import soot.jimple.StaticFieldRef;
 import soot.jimple.internal.JArrayRef;
+import sparse.IDSparseCFGBuilder;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ public class LocalFF implements FlowFunction<DFF> {
                 }
             }
         }
+        IDSparseCFGBuilder.keepStmt(aliasHandler.getMethod(), aliasHandler.getStmt(), res, source);
         return res;
     }
 

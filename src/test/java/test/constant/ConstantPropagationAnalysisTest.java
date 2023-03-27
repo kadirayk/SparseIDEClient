@@ -12,10 +12,7 @@ import soot.SootMethod;
 import soot.Transformer;
 import soot.Unit;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
-import sparse.CPAJimpleSparseCFGBuilder;
-import sparse.DefaultSparseCFGBuilder;
-import sparse.JimpleDefaultSparseCFG;
-import sparse.JimpleSparseIDESolver;
+import sparse.*;
 import target.constant.*;
 import test.base.IDETestSetUp;
 
@@ -53,7 +50,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
             protected void internalTransform(String phaseName, Map<String, String> options) {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
-                SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
+                SparseCFGBuilder sparseCFGBuilder = IDSparseCFGBuilder.v();
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                 solver.solve();
