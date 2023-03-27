@@ -13,6 +13,8 @@ import soot.Transformer;
 import soot.Unit;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import sparse.CPAJimpleSparseCFGBuilder;
+import sparse.DefaultSparseCFGBuilder;
+import sparse.JimpleDefaultSparseCFG;
 import sparse.JimpleSparseIDESolver;
 import target.constant.*;
 import test.base.IDETestSetUp;
@@ -51,7 +53,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
             protected void internalTransform(String phaseName, Map<String, String> options) {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
-                SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(false);
+                SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                 solver.solve();
@@ -197,6 +199,17 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         expected.add(new Pair("a", 100));
         expected.add(new Pair("b", 100));
         expected.add(new Pair("c", 100));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void Assignment9() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment9.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment9.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("target.constant.Assignment9.a", 100));
         checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
 
@@ -506,5 +519,74 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         expected.add(new Pair("hashCode", IDELinearConstantAnalysisProblem.BOTTOM));
         checkResults(defaultIDEResult, sparseIDEResult, expected);
     }
+
+    @Test
+    public void Array() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("A.i_0", 100));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void Array2() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array2.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array2.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("A.i_0", 100));
+        expected.add(new Pair("a", 100));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void Array3() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array3.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array3.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("A.i_0", 100));
+        expected.add(new Pair("A.i_1", 200));
+        expected.add(new Pair("A.i_2", 400));
+        expected.add(new Pair("B.i_0", 100));
+        expected.add(new Pair("B.i_1", 200));
+        expected.add(new Pair("B.i_2", 400));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void Array4() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array4.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array4.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("A.i_0", 100));
+        expected.add(new Pair("A.i_1", 200));
+        expected.add(new Pair("A.i_2", 400));
+        expected.add(new Pair("B.i_0", 100));
+        expected.add(new Pair("B.i_1", 200));
+        expected.add(new Pair("B.i_2", 400));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
+    @Test
+    public void Array5() {
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array5.class.getName());
+        Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array5.class.getName());
+        Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
+        Set<Pair<String, Integer>> expected = new HashSet<>();
+        expected.add(new Pair("A.i_999", 100));
+        expected.add(new Pair("B.i_42", 100));
+        expected.add(new Pair("a", 100));
+        checkResults(defaultIDEResult, sparseIDEResult, expected);
+    }
+
 
 }

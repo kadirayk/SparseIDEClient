@@ -78,7 +78,7 @@ public class SparseAliasManager {
 
         @Override
         public StaticFieldStrategy getStaticFieldStrategy() {
-            return StaticFieldStrategy.FLOW_SENSITIVE;
+            return StaticFieldStrategy.SINGLETON;
         }
 
         @Override

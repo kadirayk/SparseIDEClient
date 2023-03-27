@@ -117,10 +117,10 @@ public class DFF {
             sb.append(staticField.getDeclaringClass().getName());
             sb.append(".");
             sb.append(staticField.getName());
-            sb.append(": Static");
-            if (isPublic()) {
-                sb.append("_Public");
-            }
+//            sb.append(": Static");
+//            if (isPublic()) {
+//                sb.append("_Public");
+//            }
             return sb.toString();
         } else {
             sb.append(base.getName());

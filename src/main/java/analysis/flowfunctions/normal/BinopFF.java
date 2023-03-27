@@ -15,10 +15,10 @@ public class BinopFF implements FlowFunction<DFF> {
     private Value lop;
     private Value rop;
     private Value lhs;
-    private FieldStoreAliasHandler aliasHandler;
+    private AliasHandler aliasHandler;
 
 
-    public BinopFF(Value lhs, BinopExpr binop, DFF zeroValue, FieldStoreAliasHandler aliasHandler) {
+    public BinopFF(Value lhs, BinopExpr binop, DFF zeroValue, AliasHandler aliasHandler) {
         this.zeroValue = zeroValue;
         this.lhs = lhs;
         this.lop = binop.getOp1();

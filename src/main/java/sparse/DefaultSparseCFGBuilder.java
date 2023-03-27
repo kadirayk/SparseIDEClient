@@ -1,23 +1,21 @@
 package sparse;
 
 import analysis.data.DFF;
+import com.google.common.collect.Iterators;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
+import fj.P;
+import heros.solver.Pair;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
 import heros.sparse.SparseCFGQueryStat;
-import soot.Body;
-import soot.SootMethod;
-import soot.Unit;
-import soot.Value;
+import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.*;
 import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.DirectedGraph;
-import util.CFGUtil;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
  * Value is the type of DFF
  * Specialized for Constant Propagation
  */
-public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMethod, DFF> {
+public class DefaultSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMethod, DFF> {
 
     private final static Logger LOGGER = Logger.getLogger(CPAJimpleSparseCFGBuilder.class.getName());
 
@@ -36,7 +34,9 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
 
     private boolean log = false;
 
-    public CPAJimpleSparseCFGBuilder(boolean enableExceptions) {
+    private Set<Unit> stmsToRemove;
+
+    public DefaultSparseCFGBuilder(boolean enableExceptions) {
         this.enableExceptions = enableExceptions;
     }
 
@@ -47,53 +47,51 @@ public class CPAJimpleSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMet
         this.m = m;
         //log = m.getSignature().contains("com.google.common.util.concurrent.ExecutionList: void execute()");
         DirectedGraph<Unit> rawGraph = new BriefUnitGraph(m.getActiveBody());
-        List<Unit> heads = rawGraph.getHeads();
-        MutableGraph<Unit> mCFG = convertToMutableGraph(rawGraph);
-
-        queryStat.setInitialStmtCount(mCFG.nodes().size());
-        queryStat.setInitialEdgeCount(mCFG.edges().size());
-
         //handle Source
         if (d.toString().equals("<<zero>>")) {
-            queryStat.setFinalStmtCount(mCFG.nodes().size());
-            queryStat.setFinalEdgeCount(mCFG.edges().size());
-            logCFG(LOGGER, mCFG, "original", m.getActiveBody(), d);
-            return new JimpleSparseCFG(d, mCFG);
+            //logCFG(LOGGER, mCFG, "original", m.getActiveBody(), d);
+            JimpleDefaultSparseCFG cfg = new JimpleDefaultSparseCFG(d, rawGraph, null, rawGraph.size());
+//            if(m.getSignature().contains("com.google.common.base.Preconditions: java.lang.String badElementIndex(int,int,java.lang.String)")){
+//                System.out.println(cfg.toString());
+//            }
+            //System.out.println(cfg.toString());
+            return cfg;
         }
 
-
-        sparsify(mCFG, heads, d, m, rawGraph);
-
-        queryStat.setFinalStmtCount(mCFG.nodes().size());
-        queryStat.setFinalEdgeCount(mCFG.edges().size());
-        logCFG(LOGGER, mCFG, "sparse", m.getActiveBody(), d);
-        return new JimpleSparseCFG(d, mCFG);
+        Map<Unit, Unit> jumps = sparsify(d, m, rawGraph);
+        //logCFG(LOGGER, mCFG, "sparse", m.getActiveBody(), d);
+        JimpleDefaultSparseCFG cfg = new JimpleDefaultSparseCFG(d, rawGraph, jumps, rawGraph.size() - stmsToRemove.size());
+//        if(m.getSignature().contains("com.google.common.base.Preconditions: java.lang.String badElementIndex(int,int,java.lang.String)")){
+//            System.out.println(cfg.toString());
+//        }
+        //System.out.println(cfg.toString());
+        return cfg;
     }
 
-    private void sparsify(MutableGraph<Unit> mCFG, List<Unit> heads, DFF d, SootMethod m, DirectedGraph<Unit> graph) {
-        Set<Unit> stmsToRemove = new HashSet<>();
-        for (Unit head : heads) {
-            Iterator<Unit> iter = getBFSIterator(mCFG, head);
-            while (iter.hasNext()) {
-                Unit unit = iter.next();
-                if (!stmsToRemove.contains(unit) && !shouldKeepStmt(unit, d, m, graph)) {
-                    stmsToRemove.add(unit);
-                }
+    private Map<Unit, Unit> sparsify(DFF d, SootMethod m, DirectedGraph<Unit> graph) {
+        stmsToRemove = new LinkedHashSet<>();
+        Iterator<Unit> iter = graph.iterator();
+        while (iter.hasNext()){
+            Unit unit = iter.next();
+            if (!stmsToRemove.contains(unit) && !shouldKeepStmt(unit, d, m, graph)) {
+                stmsToRemove.add(unit);
             }
         }
+        Map<Unit, Unit> jumps = new HashMap<>();
+        UnitPatchingChain units = m.getActiveBody().getUnits();
         for (Unit unit : stmsToRemove) {
-            Set<Unit> preds = mCFG.predecessors(unit);
-            Set<Unit> succs = mCFG.successors(unit);
-            if (preds.size() == 1 && succs.size() == 1) {
-                // we do this to be safe, but one can investigate removing multiple edges
-                mCFG.removeNode(unit);
-                mCFG.putEdge(preds.iterator().next(), succs.iterator().next());
-                if(log){
-                    System.out.println("removing: " + unit + " for " + d + " in " + m.getSignature());
+            Unit pred = units.getPredOf(unit);
+            Unit succ = units.getSuccOf(unit);
+            if(!stmsToRemove.contains(pred)){
+                while(stmsToRemove.contains(succ)){
+                    succ = units.getSuccOf(succ);
                 }
+                jumps.put(pred, succ);
             }
         }
+        return jumps;
     }
+
 
     protected Iterator<Unit> getBFSIterator(MutableGraph<Unit> graph, Unit head) {
         Traverser<Unit> traverser = Traverser.forGraph(graph);

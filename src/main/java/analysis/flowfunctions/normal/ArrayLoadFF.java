@@ -3,22 +3,22 @@ package analysis.flowfunctions.normal;
 import analysis.data.DFF;
 import heros.FlowFunction;
 import soot.Value;
-import soot.jimple.FieldRef;
+import soot.jimple.internal.JArrayRef;
 import soot.jimple.internal.JInstanceFieldRef;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FieldLoadFF implements FlowFunction<DFF> {
+public class ArrayLoadFF implements FlowFunction<DFF> {
 
-    private AliasHandler aliasHandler;
-    private FieldRef fieldRef;
-    private Value lhs;
     private DFF zeroValue;
+    private AliasHandler aliasHandler;
+    private JArrayRef arrayRef;
+    private Value lhs;
 
-    public FieldLoadFF(FieldRef fieldRef, Value lhs, DFF zeroValue, AliasHandler aliasHandler) {
-        this.fieldRef = fieldRef;
+    public ArrayLoadFF(JArrayRef arrayRef, Value lhs, DFF zeroValue, AliasHandler aliasHandler) {
+        this.arrayRef = arrayRef;
         this.lhs = lhs;
         this.zeroValue = zeroValue;
         this.aliasHandler = aliasHandler;
@@ -32,7 +32,7 @@ public class FieldLoadFF implements FlowFunction<DFF> {
         }
         Set<DFF> res = new HashSet<>();
         res.add(source);
-        if(DFF.asDFF(fieldRef).equals(source)){
+        if(DFF.asDFF(arrayRef).equals(source)){
             res.add(DFF.asDFF(lhs));
             aliasHandler.handleAliases(res);
         }

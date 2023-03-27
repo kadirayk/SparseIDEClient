@@ -9,9 +9,8 @@ import soot.Local;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
-import soot.jimple.BinopExpr;
-import soot.jimple.DefinitionStmt;
-import soot.jimple.IntConstant;
+import soot.jimple.*;
+import soot.jimple.internal.JArrayRef;
 import soot.jimple.internal.JInstanceFieldRef;
 
 
@@ -27,19 +26,22 @@ public class CPANormalFlowFunctionProvider implements FlowFunctionProvider<DFF> 
             Value rhs = assignment.getRightOp();
             // assignment of constant integer
             if (rhs instanceof IntConstant) {
-                flowFunction = new ConstantFF(new DFF(lhs, curr), zeroValue, new FieldStoreAliasHandler(method, curr, lhs));
+                flowFunction = new ConstantFF(new DFF(lhs, curr), zeroValue, AliasHandlerProvider.get(method, curr, lhs));
             } else if (rhs instanceof BinopExpr) {
                 // assignment of binop
                 BinopExpr binop = (BinopExpr) rhs;
-                flowFunction = new BinopFF(lhs, binop, zeroValue, new FieldStoreAliasHandler(method, curr, lhs));
+                flowFunction = new BinopFF(lhs, binop, zeroValue, AliasHandlerProvider.get(method, curr, lhs));
             } else if (rhs instanceof Local) {
                 // assignment of local
                 Local right = (Local) rhs;
-                flowFunction = new LocalFF(right, lhs, new FieldStoreAliasHandler(method, curr, lhs));
-            } else if (rhs instanceof JInstanceFieldRef) {
+                flowFunction = new LocalFF(right, lhs, zeroValue, AliasHandlerProvider.get(method, curr, lhs));
+            } else if (rhs instanceof FieldRef) {
                 // assignment of instance field
-                JInstanceFieldRef fieldRef = (JInstanceFieldRef) rhs;
-                flowFunction = new FieldLoadFF(fieldRef, lhs, new FieldStoreAliasHandler(method, curr, lhs));
+                FieldRef fieldRef = (FieldRef) rhs;
+                flowFunction = new FieldLoadFF(fieldRef, lhs, zeroValue, AliasHandlerProvider.get(method, curr, lhs));
+            } else if (rhs instanceof JArrayRef) {
+                JArrayRef arrRef = (JArrayRef) rhs;
+                flowFunction = new ArrayLoadFF(arrRef, lhs, zeroValue, AliasHandlerProvider.get(method, curr, lhs));
             }
         }
     }

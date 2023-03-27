@@ -20,8 +20,6 @@ public class EvalPrinter {
     private int methodCount = 0;
     private long sparseCFGBuildtime = 0;
     private long scfgBuildCount = 0;
-    private float initalStmtCount = 0;
-    private float finalStmtCount = 0;
 
 
     public EvalPrinter(String solver) {
@@ -41,11 +39,7 @@ public class EvalPrinter {
         for (SparseCFGQueryStat queryStat : queryStats) {
             if(!queryStat.isRetrievedFromCache()){
                 sparseCFGBuildtime += queryStat.getDuration().toMillis();
-                //if (queryStat.getInitialStmtCount() > 0 && queryStat.getFinalStmtCount() > 0) { // check for cache retrieve
-                    initalStmtCount += queryStat.getInitialStmtCount();
-                    finalStmtCount += queryStat.getFinalStmtCount();
-                    scfgBuildCount++;
-                //}
+                scfgBuildCount++;
             }
         }
     }
@@ -74,8 +68,6 @@ public class EvalPrinter {
                 str.append("SCFGConst");
                 str.append(",");
                 str.append("SCFGCount");
-                str.append(",");
-                str.append("DoS");
                 str.append(System.lineSeparator());
                 writer.write(str.toString());
             } catch (IOException e) {
@@ -99,8 +91,6 @@ public class EvalPrinter {
             str.append(sparseCFGBuildtime);
             str.append(",");
             str.append(scfgBuildCount);
-            str.append(",");
-            str.append(degreeOfSparsification());
             str.append(System.lineSeparator());
             writer.write(str.toString());
         } catch (IOException e) {
@@ -108,11 +98,5 @@ public class EvalPrinter {
         }
     }
 
-    private String degreeOfSparsification(){
-        if(finalStmtCount!=0){
-            return String.format("%.2f",(initalStmtCount-finalStmtCount)/initalStmtCount);
-        }
-        return "0";
-    }
 
 }

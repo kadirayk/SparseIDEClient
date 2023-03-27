@@ -29,9 +29,8 @@ public class ArtificialObjectsCache {
     public static SootField getSootField(JArrayRef arr) {
         Value base = arr.getBase();
         Value index = arr.getIndex();
-        ArrayType type = (ArrayType) base.getType();
         SootClass sc = getSootClass(base);
-        SootField sootField = Scene.v().makeSootField("i_" + index.toString(), type.getArrayElementType());
+        SootField sootField = Scene.v().makeSootField("i_" + index.toString(), arr.getType());
         sootField.setDeclaringClass(sc);
         sootField.setDeclared(true);
         String str = sootFieldString(sootField);

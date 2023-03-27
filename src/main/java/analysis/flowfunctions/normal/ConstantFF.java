@@ -7,9 +7,9 @@ import java.util.Set;
 
 public class ConstantFF extends Gen<DFF> {
 
-    private FieldStoreAliasHandler aliasHandler;
+    private AliasHandler aliasHandler;
 
-    public ConstantFF(DFF genValue, DFF zeroValue, FieldStoreAliasHandler aliasHandler) {
+    public ConstantFF(DFF genValue, DFF zeroValue, AliasHandler aliasHandler) {
         super(genValue, zeroValue);
         this.aliasHandler = aliasHandler;
     }

@@ -12,6 +12,7 @@ import soot.jimple.IntConstant;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
 import sparse.CPAJimpleSparseCFGBuilder;
+import sparse.DefaultSparseCFGBuilder;
 import sparse.JimpleSparseIDESolver;
 
 import java.io.File;
@@ -73,7 +74,10 @@ public class SetUp {
                     mSolver.addFinalResults(method.getSignature());
                     getResult(mSolver, method);
                 }
-                solver.dumpResults(EvalHelper.getTargetName());
+                if(solver!=null){
+                    solver.dumpResults(EvalHelper.getTargetName());
+                }
+
             }
         };
     }
@@ -86,7 +90,7 @@ public class SetUp {
                 for (SootMethod method : entryMethods) {
                     System.out.println("sparse solving " + method.getSignature());
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
-                    SparseCFGBuilder sparseCFGBuilder = new CPAJimpleSparseCFGBuilder(true);
+                    SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
                     @SuppressWarnings({"rawtypes", "unchecked"})
                     JimpleSparseIDESolver<?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                     mSolver.solve();
@@ -94,7 +98,10 @@ public class SetUp {
                     mSolver.addFinalResults(method.toString());
                     getResult(mSolver, method);
                 }
-                sparseSolver.dumpResults(EvalHelper.getTargetName());
+                if(sparseSolver!=null){
+                    sparseSolver.dumpResults(EvalHelper.getTargetName());
+                }
+
             }
         };
     }
@@ -149,7 +156,8 @@ public class SetUp {
                     if(isPublicAPI(m)){
                         m.retrieveActiveBody();
                         if (m.hasActiveBody()) {
-                            if(m.getReturnType() instanceof IntegerType && m.getParameterTypes().stream().anyMatch(t->t instanceof IntegerType && !t.equals(BooleanType.v()))){
+                            if(m.getSignature().contains("normalizeDocument")){
+                            //if(m.getReturnType() instanceof IntegerType && m.getParameterTypes().stream().anyMatch(t->t instanceof IntegerType && !t.equals(BooleanType.v()))){
                                 UnitPatchingChain units = m.getActiveBody().getUnits();
                                 for (Unit unit : units) {
                                     if(unit instanceof DefinitionStmt){
@@ -174,7 +182,8 @@ public class SetUp {
             EvalHelper.setActualMethodCount(methods.size());
             return methods;
         }
-        throw new RuntimeException("no entry methods found to start");
+        System.out.println("no entry methods found to start");
+        return Collections.EMPTY_LIST;
     }
 
     public Set<Pair<String, Integer>> getResult(Object analysis, SootMethod method) {

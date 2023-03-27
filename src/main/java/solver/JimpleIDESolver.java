@@ -8,6 +8,7 @@ import heros.solver.IDESolver;
 import java.io.*;
 import java.util.*;
 
+import heros.solver.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soot.PatchingChain;
@@ -29,16 +30,13 @@ public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod
         this.dumpResults(targetClassName);
     }
 
-    private static Map<String, Set<String>> checkedMethods = new TreeMap<>();
+    private static List<Pair<String, Set<String>>> checked = new ArrayList<>();
 
     public void addFinalResults(String entryMethod) {
         Iterator iter = this.val.cellSet().iterator();
         while (iter.hasNext()) {
             Table.Cell<Unit, D, ?> entry = (Table.Cell) iter.next();
             SootMethod method = this.icfg.getMethodOf(entry.getRowKey());
-            if (checkedMethods.containsKey(method.getSignature())) {
-                continue;
-            }
             Unit lastStmt = method.getActiveBody().getUnits().getLast();
             Set<String> results = new TreeSet<>();
             Map<D, V> res = this.resultsAt(lastStmt);
@@ -48,7 +46,10 @@ public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod
                 }
             }
             if(!results.isEmpty()){
-                checkedMethods.put(method.getSignature(), results);
+                Pair pair = new Pair(method.getSignature(), results);
+                if(!checked.contains(pair)){
+                    checked.add(pair);
+                }
             }
         }
     }
@@ -60,11 +61,10 @@ public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod
         }
         File file = new File(OUT_PUT_DIR + File.separator + "default-" + targetClassName + ".csv");
         try (FileWriter writer = new FileWriter(file, true)) {
-            for (String key : checkedMethods.keySet()) {
-                for (String res : checkedMethods.get(key)) {
-                    String str = key + ";" + res + System.lineSeparator();
+            for (Pair<String, Set<String>> pair : checked) {
+                for(String res: pair.getO2()){
+                    String str = pair.getO1() + ";" + res + System.lineSeparator();
                     writer.write(str);
-
                 }
             }
         } catch (IOException e) {

@@ -10,38 +10,37 @@ import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.Stmt;
-import soot.jimple.internal.JInstanceFieldRef;
+import soot.jimple.internal.JArrayRef;
 
-import java.util.Collections;
 import java.util.Set;
 
-public class FieldStoreAliasHandler implements AliasHandler {
+public class ArrayStoreAliasHandler implements AliasHandler {
 
-    private JInstanceFieldRef fieldRef;
+    private JArrayRef arrayRef;
     private Unit curr;
     private SootMethod method;
 
-    public FieldStoreAliasHandler(SootMethod method, Unit curr, Value lhs) {
-        if(lhs instanceof JInstanceFieldRef){
-            this.fieldRef = (JInstanceFieldRef) lhs;
+    public ArrayStoreAliasHandler(SootMethod method, Unit curr, Value lhs) {
+        if (lhs instanceof JArrayRef) {
+            this.arrayRef = (JArrayRef) lhs;
         }
         this.curr = curr;
         this.method = method;
     }
 
-
     @Override
     public void handleAliases(Set<DFF> res) {
-        if(this.fieldRef!=null) {
+        if (this.arrayRef != null) {
             SparseAliasManager aliasManager = SparseAliasManager.getInstance(SparseCFGCache.SparsificationStrategy.NONE, true);
-            Set<AccessPath> aliases = aliasManager.getAliases((Stmt) curr, method, fieldRef.getBase());
+            Set<AccessPath> aliases = aliasManager.getAliases((Stmt) curr, method, arrayRef.getBase());
             for (AccessPath alias : aliases) {
                 Val base = alias.getBase();
                 if (base instanceof JimpleVal) {
                     JimpleVal jval = (JimpleVal) base;
                     Value delegate = jval.getDelegate();
-                    if(!delegate.equals(fieldRef.getBase())){
-                        res.add(new DFF(delegate, curr, Collections.singletonList(fieldRef.getField())));
+                    if(!delegate.equals(arrayRef.getBase())){
+                        JArrayRef newRef = new JArrayRef(delegate, arrayRef.getIndex());
+                        res.add(new DFF(newRef, curr));
                     }
                 }
             }
