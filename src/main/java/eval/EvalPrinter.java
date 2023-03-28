@@ -68,6 +68,8 @@ public class EvalPrinter {
                 str.append("SCFGConst");
                 str.append(",");
                 str.append("SCFGCount");
+                str.append(",");
+                str.append("mem");
                 str.append(System.lineSeparator());
                 writer.write(str.toString());
             } catch (IOException e) {
@@ -91,11 +93,22 @@ public class EvalPrinter {
             str.append(sparseCFGBuildtime);
             str.append(",");
             str.append(scfgBuildCount);
+            str.append(",");
+            str.append(getMemoryUsage());
             str.append(System.lineSeparator());
             writer.write(str.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * in MB
+     * @return
+     */
+    private static int getMemoryUsage() {
+        Runtime runtime = Runtime.getRuntime();
+        return Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024*1024));
     }
 
 

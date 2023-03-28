@@ -3,9 +3,8 @@ package analysis.flowfunctions.normal;
 import analysis.data.DFF;
 import heros.FlowFunction;
 import soot.Local;
-import soot.SootFieldRef;
 import soot.Value;
-import soot.jimple.StaticFieldRef;
+import soot.jimple.FieldRef;
 import soot.jimple.internal.JArrayRef;
 
 import java.util.Collections;
@@ -45,7 +44,7 @@ public class LocalFF implements FlowFunction<DFF> {
         if(source.getValue() instanceof JArrayRef){
             JArrayRef arrayRef = (JArrayRef) source.getValue();
             if(arrayRef.getBase().equals(right)){
-                if(!(lhs instanceof StaticFieldRef)){
+                if(!(lhs instanceof FieldRef)){
                     JArrayRef newRef = new JArrayRef(lhs, arrayRef.getIndex());
                     res.add(DFF.asDFF(newRef));
                     aliasHandler.handleAliases(res);
