@@ -75,6 +75,7 @@ public abstract class IDETestSetUp {
         Options.v().set_no_bodies_for_excluded(true);
         Options.v().set_allow_phantom_refs(true);
         Options.v().setPhaseOption("jb", "use-original-names:true");
+        Options.v().setPhaseOption("jb.ls", "enabled:false");
 		Options.v().set_prepend_classpath(false);
 
         Scene.v().addBasicClass("java.lang.StringBuilder");
