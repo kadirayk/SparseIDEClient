@@ -39,7 +39,7 @@ public class IntegerBinop implements EdgeFunction<Integer> {
             IntConstant ic = (IntConstant) lop;
             return executeBinOperation(op, ic.value, source);
         }
-        throw new IllegalStateException("Only linear constant propagation can be specified!");
+        return IDELinearConstantAnalysisProblem.BOTTOM;
     }
 
     public static int executeBinOperation(String op, int lhs, int rhs) {
