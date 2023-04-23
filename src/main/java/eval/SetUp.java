@@ -148,8 +148,12 @@ public class SetUp {
 
     protected List<SootMethod> getEntryPointMethods() {
         List<SootMethod> methods = new ArrayList<>();
+        Set<SootClass> classes = new HashSet<>();
+        for(SootClass c: Scene.v().getApplicationClasses()){
+            classes.add(c);
+        }
         l1:
-        for (SootClass c : Scene.v().getApplicationClasses()) {
+        for (SootClass c : classes) {
             for (SootMethod m : c.getMethods()) {
                 MethodSource source = m.getSource();
                 if(source!=null){
