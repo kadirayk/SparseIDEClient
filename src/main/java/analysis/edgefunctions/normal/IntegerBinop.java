@@ -98,7 +98,7 @@ public class IntegerBinop implements EdgeFunction<Integer> {
         } else if (otherFunction instanceof IntegerAllBottom) {
             return otherFunction;
         }
-        throw new RuntimeException("can't meeet: " + this.toString() + " and " + otherFunction.toString());
+        throw new RuntimeException("can't meet: " + this.toString() + " and " + otherFunction.toString());
     }
 
     @Override

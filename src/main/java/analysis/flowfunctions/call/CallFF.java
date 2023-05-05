@@ -6,6 +6,7 @@ import soot.Local;
 import soot.SootMethod;
 import soot.Value;
 import soot.jimple.IntConstant;
+import soot.jimple.StaticFieldRef;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +35,9 @@ public class CallFF implements FlowFunction<DFF> {
             return Collections.emptySet();
         }
         Set<DFF> res = new HashSet<>();
+        if(source==zeroValue || source.getValue() instanceof StaticFieldRef){
+            res.add(source);
+        }
         for (int i = 0; i < callArgs.size(); i++) {
             // Special case: check if function is called with integer literals as params
             if (callArgs.get(i) instanceof IntConstant && source == zeroValue) {

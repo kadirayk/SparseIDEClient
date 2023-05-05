@@ -27,7 +27,7 @@ public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod
 
     public void solve(String targetClassName) {
         super.solve();
-        this.dumpResults(targetClassName);
+        //this.dumpResults(targetClassName);
     }
 
     private static List<Pair<String, Set<String>>> checked = new ArrayList<>();

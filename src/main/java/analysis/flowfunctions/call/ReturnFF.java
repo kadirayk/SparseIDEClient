@@ -4,6 +4,7 @@ import analysis.data.DFF;
 import analysis.flowfunctions.normal.FieldStoreAliasHandler;
 import heros.FlowFunction;
 import soot.Local;
+import soot.jimple.StaticFieldRef;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +29,9 @@ public class ReturnFF implements FlowFunction<DFF> {
         if (source.equals(DFF.asDFF(retLocal))) {
             res.add(DFF.asDFF(tgtLocal));
             aliasHandler.handleAliases(res);
+        }
+        if(source.getValue() instanceof StaticFieldRef){
+            res.add(source);
         }
         return res;
     }

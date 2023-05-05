@@ -29,7 +29,7 @@ public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, Soot
 
     public void solve(String targetClassName) {
         super.solve();
-        this.dumpResults(targetClassName);
+        //this.dumpResults(targetClassName);
     }
 
     //private static Map<String, Set<String>> checkedMethods = new TreeMap<>();

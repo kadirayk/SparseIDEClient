@@ -9,7 +9,9 @@ import analysis.flowfunctions.CPAReturnFlowFunctionProvider;
 import heros.*;
 import heros.edgefunc.EdgeIdentity;
 import heros.flowfunc.Identity;
+import heros.flowfunc.KillAll;
 import soot.*;
+import soot.jimple.StaticFieldRef;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.ide.DefaultJimpleIDETabulationProblem;
 import soot.toolkits.graph.BriefUnitGraph;
@@ -17,6 +19,7 @@ import soot.toolkits.graph.DirectedGraph;
 import util.CFGUtil;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -107,13 +110,24 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
 
             @Override
             public FlowFunction<DFF> getReturnFlowFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Unit returnSite) {
-                CPAReturnFlowFunctionProvider ffp = new CPAReturnFlowFunctionProvider(callSite, exitStmt, icfg.getMethodOf(callSite));
+                CPAReturnFlowFunctionProvider ffp = new CPAReturnFlowFunctionProvider(callSite, exitStmt, icfg.getMethodOf(callSite), icfg.getMethodOf(exitStmt));
                 return ffp.getFlowFunction();
             }
 
             @Override
             public FlowFunction<DFF> getCallToReturnFlowFunction(Unit callSite, Unit returnSite) {
-                return Identity.v();
+                // we kill statics and keep rest as id
+                return new FlowFunction<DFF>() {
+                    @Override
+                    public Set<DFF> computeTargets(DFF source) {
+                        if(source.getValue() instanceof StaticFieldRef){
+                            return Collections.emptySet();
+                        }
+                        Set<DFF> res = new HashSet<>();
+                        res.add(source);
+                        return res;
+                    }
+                };
             }
         };
     }
