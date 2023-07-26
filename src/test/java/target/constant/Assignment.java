@@ -12,4 +12,13 @@ public class Assignment {
         int d = 121;
     }
 
+    public void entryPoint_a(){
+        int a = 100;
+        int b = inc(a);
+    }
+
+    public int inc(int x){
+        return x++;
+    }
+
 }

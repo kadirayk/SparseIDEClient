@@ -1,11 +1,13 @@
 package analysis;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import analysis.edgefunctions.CPANormalEdgeFunctionProvider;
 import analysis.edgefunctions.normal.IntegerTop;
 import analysis.flowfunctions.CPACallFlowFunctionProvider;
 import analysis.flowfunctions.CPANormalFlowFunctionProvider;
 import analysis.flowfunctions.CPAReturnFlowFunctionProvider;
+import connector.MetaJimpleIDETabulationProblem;
 import heros.*;
 import heros.edgefunc.EdgeIdentity;
 import heros.flowfunc.Identity;
@@ -23,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulationProblem<DFF, Integer, InterproceduralCFG<Unit, SootMethod>> {
+public class IDELinearConstantAnalysisProblem extends MetaJimpleIDETabulationProblem<DFF, Integer, InterproceduralCFG<Unit, SootMethod>, MetaInfo> {
 
     protected InterproceduralCFG<Unit, SootMethod> icfg;
 
@@ -94,30 +96,30 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
     }
 
     @Override
-    protected FlowFunctions<Unit, DFF, SootMethod> createFlowFunctionsFactory() {
-        return new FlowFunctions<Unit, DFF, SootMethod>() {
+    protected FlowFunctions<Unit, DFF, SootMethod, MetaInfo> createFlowFunctionsFactory() {
+        return new FlowFunctions<Unit, DFF, SootMethod, MetaInfo>() {
             @Override
-            public FlowFunction<DFF> getNormalFlowFunction(Unit curr, Unit succ) {
+            public FlowFunction<DFF, MetaInfo> getNormalFlowFunction(Unit curr, Unit succ) {
                 CPANormalFlowFunctionProvider ffp = new CPANormalFlowFunctionProvider(icfg.getMethodOf(curr), curr, zeroValue());
                 return ffp.getFlowFunction();
             }
 
             @Override
-            public FlowFunction<DFF> getCallFlowFunction(Unit callStmt, SootMethod dest) {
+            public FlowFunction<DFF, MetaInfo> getCallFlowFunction(Unit callStmt, SootMethod dest) {
                 CPACallFlowFunctionProvider ffp = new CPACallFlowFunctionProvider(callStmt, dest, zeroValue());
                 return ffp.getFlowFunction();
             }
 
             @Override
-            public FlowFunction<DFF> getReturnFlowFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Unit returnSite) {
+            public FlowFunction<DFF, MetaInfo> getReturnFlowFunction(Unit callSite, SootMethod calleeMethod, Unit exitStmt, Unit returnSite) {
                 CPAReturnFlowFunctionProvider ffp = new CPAReturnFlowFunctionProvider(callSite, exitStmt, icfg.getMethodOf(callSite), icfg.getMethodOf(exitStmt));
                 return ffp.getFlowFunction();
             }
 
             @Override
-            public FlowFunction<DFF> getCallToReturnFlowFunction(Unit callSite, Unit returnSite) {
+            public FlowFunction<DFF, MetaInfo> getCallToReturnFlowFunction(Unit callSite, Unit returnSite) {
                 // we kill statics and keep rest as id
-                return new FlowFunction<DFF>() {
+                return new FlowFunction<DFF, MetaInfo>() {
                     @Override
                     public Set<DFF> computeTargets(DFF source) {
                         if(source.getValue() instanceof StaticFieldRef){
@@ -126,6 +128,11 @@ public class IDELinearConstantAnalysisProblem extends DefaultJimpleIDETabulation
                         Set<DFF> res = new HashSet<>();
                         res.add(source);
                         return res;
+                    }
+
+                    @Override
+                    public MetaInfo getMeta() {
+                        return new MetaInfo(callSite, icfg.getMethodOf(callSite).makeRef());
                     }
                 };
             }

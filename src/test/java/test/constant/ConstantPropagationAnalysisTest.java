@@ -39,7 +39,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
                 @SuppressWarnings({"rawtypes", "unchecked"})
-                JimpleIDESolver<?, ?, ?> solver = new JimpleIDESolver<>(problem);
+                JimpleIDESolver<?, ?, ?, ?> solver = new JimpleIDESolver<>(problem);
                 solver.solve();
                 IDETestSetUp.solver = solver;
             }
@@ -55,7 +55,7 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
                 SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
                 @SuppressWarnings({"rawtypes", "unchecked"})
-                JimpleSparseIDESolver<?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
+                JimpleSparseIDESolver<?, ?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                 solver.solve();
                 IDETestSetUp.sparseSolver = solver;
             }
@@ -101,9 +101,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -114,9 +114,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -127,9 +127,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -140,9 +140,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -153,9 +153,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 13));
@@ -165,9 +165,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment6() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment6.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment6.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment6.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment6.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 101));
@@ -177,9 +177,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment7() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment7.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment7.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment7.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment7.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -191,9 +191,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment8() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment8.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment8.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment8.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment8.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -204,9 +204,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Assignment9() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Assignment9.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Assignment9.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Assignment9.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Assignment9.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("target.constant.Assignment9.a", 100));
@@ -215,9 +215,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 10));
@@ -228,9 +228,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 0));
@@ -241,9 +241,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -253,9 +253,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -266,9 +266,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -279,9 +279,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Branching6() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Branching6.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Branching6.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Branching6.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Branching6.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 23));
@@ -292,9 +292,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -306,9 +306,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -320,9 +320,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -334,9 +334,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -348,9 +348,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -363,9 +363,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Context6() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Context6.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Context6.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Context6.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Context6.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("target.constant.Context6.a", 100));
@@ -376,9 +376,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Loop() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Loop.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Loop.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Loop.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Loop.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("sum", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -388,9 +388,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Loop2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Loop2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Loop2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Loop2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Loop2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("sum", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -400,9 +400,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Loop3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Loop3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Loop3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Loop3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Loop3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("sum", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -411,9 +411,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Loop4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Loop4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Loop4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Loop4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Loop4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("sum", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -422,9 +422,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Loop5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Loop5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Loop5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Loop5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Loop5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("sum", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -434,9 +434,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("field.x", 100));
@@ -446,9 +446,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("field.x", 100));
@@ -458,9 +458,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("field.x", 100));
@@ -470,9 +470,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -482,9 +482,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("field.x", 100));
@@ -494,9 +494,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field6() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field6.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field6.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field6.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field6.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -507,9 +507,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Field7() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Field7.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Field7.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Field7.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Field7.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 100));
@@ -520,9 +520,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void NonLinear() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(NonLinear.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(NonLinear.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(NonLinear.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(NonLinear.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("a", 1));
@@ -531,9 +531,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void NonLinear2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(NonLinear2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(NonLinear2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(NonLinear2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(NonLinear2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("i", IDELinearConstantAnalysisProblem.BOTTOM));
@@ -543,9 +543,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Array() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Array.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Array.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("A.i_0", 100));
@@ -554,9 +554,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Array2() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array2.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Array2.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array2.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Array2.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("A.i_0", 100));
@@ -566,9 +566,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Array3() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array3.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Array3.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array3.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Array3.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("A.i_0", 100));
@@ -582,9 +582,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Array4() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array4.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Array4.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array4.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Array4.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("A.i_0", 100));
@@ -598,9 +598,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
 
     @Test
     public void Array5() {
-        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> analysis = executeStaticAnalysis(Array5.class.getName());
+        JimpleIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> analysis = executeStaticAnalysis(Array5.class.getName());
         Set<Pair<String, Integer>> defaultIDEResult = getResult(analysis);
-        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>> sparseAnalysis = executeSparseStaticAnalysis(Array5.class.getName());
+        JimpleSparseIDESolver<?, ?, ? extends InterproceduralCFG<Unit, SootMethod>, ?> sparseAnalysis = executeSparseStaticAnalysis(Array5.class.getName());
         Set<Pair<String, Integer>> sparseIDEResult = getResult(sparseAnalysis);
         Set<Pair<String, Integer>> expected = new HashSet<>();
         expected.add(new Pair("A.i_999", 100));

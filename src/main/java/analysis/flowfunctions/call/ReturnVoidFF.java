@@ -1,6 +1,7 @@
 package analysis.flowfunctions.call;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import analysis.flowfunctions.normal.FieldStoreAliasHandler;
 import heros.FlowFunction;
 import heros.solver.Pair;
@@ -14,13 +15,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ReturnVoidFF implements FlowFunction<DFF> {
+public class ReturnVoidFF implements FlowFunction<DFF, MetaInfo> {
     private Unit callsite;
     private SootMethod method;
+    private MetaInfo info;
 
-    public ReturnVoidFF(Unit callsite, SootMethod method) {
+    public ReturnVoidFF(Unit callsite, SootMethod method, MetaInfo info) {
         this.callsite = callsite;
         this.method = method;
+        this.info = info;
     }
 
 
@@ -50,6 +53,11 @@ public class ReturnVoidFF implements FlowFunction<DFF> {
             res.add(source);
         }
         return res;
+    }
+
+    @Override
+    public MetaInfo getMeta() {
+        return info;
     }
 
     boolean isSameParam(SootMethod method, Pair<Value, Integer> actualParam, Value formalParam){

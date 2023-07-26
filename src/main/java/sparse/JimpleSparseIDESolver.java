@@ -18,12 +18,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod>> extends SparseIDESolver<Unit, D, SootMethod, V, I> {
+public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod>,X> extends SparseIDESolver<Unit, D, SootMethod, V, I,X> {
     private static final Logger logger = LoggerFactory.getLogger(JimpleSparseIDESolver.class);
 
     private static final String OUT_PUT_DIR = "./out";
 
-    public JimpleSparseIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
+    public JimpleSparseIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I,X> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
         super(problem, sparseCFGBuilder);
     }
 

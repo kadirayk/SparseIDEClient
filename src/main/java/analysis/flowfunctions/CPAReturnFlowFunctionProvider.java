@@ -2,6 +2,7 @@ package analysis.flowfunctions;
 
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import analysis.flowfunctions.call.CallFF;
 import analysis.flowfunctions.call.ReturnFF;
 import analysis.flowfunctions.call.ReturnVoidFF;
@@ -24,9 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 
-public class CPAReturnFlowFunctionProvider implements FlowFunctionProvider<DFF> {
+public class CPAReturnFlowFunctionProvider implements FlowFunctionProvider<DFF, MetaInfo> {
 
-    private FlowFunction<DFF> flowFunction;
+    private FlowFunction<DFF, MetaInfo> flowFunction;
 
     public CPAReturnFlowFunctionProvider(Unit callSite, Unit exitStmt, SootMethod caller, SootMethod callee){
         flowFunction = KillAll.v(); // we want to kill everything else when returning from a nested context
@@ -40,16 +41,16 @@ public class CPAReturnFlowFunctionProvider implements FlowFunctionProvider<DFF> 
                     if (leftOp instanceof Local) {
                         final Local tgtLocal = (Local) leftOp;
                         final Local retLocal = (Local) op;
-                        flowFunction = new ReturnFF(tgtLocal, retLocal, new FieldStoreAliasHandler(caller, callSite, tgtLocal));
+                        flowFunction = new ReturnFF(tgtLocal, retLocal, new FieldStoreAliasHandler(caller, callSite, tgtLocal), new MetaInfo(callSite, caller.makeRef()));
                     }
                 }
             }
         }else if(exitStmt instanceof JReturnVoidStmt){
-            flowFunction = new ReturnVoidFF(callSite, callee);
+            flowFunction = new ReturnVoidFF(callSite, callee, new MetaInfo(callSite, caller.makeRef()));
         }
     }
 
-    public FlowFunction<DFF> getFlowFunction(){
+    public FlowFunction<DFF, MetaInfo> getFlowFunction(){
         return flowFunction;
     }
 

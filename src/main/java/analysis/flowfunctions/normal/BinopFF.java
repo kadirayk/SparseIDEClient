@@ -1,7 +1,9 @@
 package analysis.flowfunctions.normal;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import heros.FlowFunction;
+import soot.Unit;
 import soot.Value;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
@@ -9,21 +11,30 @@ import soot.jimple.IntConstant;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BinopFF implements FlowFunction<DFF> {
+public class BinopFF implements FlowFunction<DFF, MetaInfo> {
 
     private DFF zeroValue;
     private Value lop;
     private Value rop;
     private Value lhs;
     private AliasHandler aliasHandler;
+    private Unit unit;
 
+    @Override
+    public MetaInfo getMeta() {
+        return info;
+    }
 
-    public BinopFF(Value lhs, BinopExpr binop, DFF zeroValue, AliasHandler aliasHandler) {
+    private MetaInfo info;
+
+    public BinopFF(Value lhs, BinopExpr binop, DFF zeroValue, AliasHandler aliasHandler, Unit unit, MetaInfo info) {
         this.zeroValue = zeroValue;
         this.lhs = lhs;
         this.lop = binop.getOp1();
         this.rop = binop.getOp2();
         this.aliasHandler = aliasHandler;
+        this.unit = unit;
+        this.info = info;
     }
 
     @Override

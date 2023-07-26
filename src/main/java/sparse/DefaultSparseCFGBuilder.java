@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMethod, DFF> {
 
-    private final static Logger LOGGER = Logger.getLogger(CPAJimpleSparseCFGBuilder.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(DefaultSparseCFGBuilder.class.getName());
 
     private boolean addedInvoke = false;
 

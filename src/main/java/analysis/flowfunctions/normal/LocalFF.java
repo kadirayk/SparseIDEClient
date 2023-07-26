@@ -1,8 +1,10 @@
 package analysis.flowfunctions.normal;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import heros.FlowFunction;
 import soot.Local;
+import soot.Unit;
 import soot.Value;
 import soot.jimple.FieldRef;
 import soot.jimple.internal.JArrayRef;
@@ -14,18 +16,22 @@ import java.util.Set;
 /**
  * Assignment from a single local
  */
-public class LocalFF implements FlowFunction<DFF> {
+public class LocalFF implements FlowFunction<DFF, MetaInfo> {
 
     private Local right;
     private Value lhs;
     private DFF zeroValue;
     private AliasHandler aliasHandler;
+    private Unit unit;
+    private MetaInfo info;
 
-    public LocalFF(Local right, Value lhs, DFF zeroValue, AliasHandler aliasHandler) {
+    public LocalFF(Local right, Value lhs, DFF zeroValue, AliasHandler aliasHandler, Unit unit, MetaInfo metaInfo) {
         this.right = right;
         this.lhs = lhs;
         this.zeroValue = zeroValue;
         this.aliasHandler = aliasHandler;
+        this.unit = unit;
+        info = metaInfo;
     }
 
 
@@ -52,6 +58,11 @@ public class LocalFF implements FlowFunction<DFF> {
             }
         }
         return res;
+    }
+
+    @Override
+    public MetaInfo getMeta() {
+        return info;
     }
 
 

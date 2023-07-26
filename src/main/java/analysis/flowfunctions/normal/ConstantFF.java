@@ -1,17 +1,21 @@
 package analysis.flowfunctions.normal;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import heros.flowfunc.Gen;
+import soot.Unit;
 
 import java.util.Set;
 
-public class ConstantFF extends Gen<DFF> {
+public class ConstantFF extends Gen<DFF, MetaInfo> {
 
     private AliasHandler aliasHandler;
+    private Unit unit;
 
-    public ConstantFF(DFF genValue, DFF zeroValue, AliasHandler aliasHandler) {
-        super(genValue, zeroValue);
+    public ConstantFF(DFF genValue, DFF zeroValue, AliasHandler aliasHandler, Unit unit, MetaInfo info) {
+        super(genValue, zeroValue, info);
         this.aliasHandler = aliasHandler;
+        this.unit = unit;
     }
 
     @Override
@@ -20,4 +24,5 @@ public class ConstantFF extends Gen<DFF> {
         aliasHandler.handleAliases(res);
         return res;
     }
+
 }

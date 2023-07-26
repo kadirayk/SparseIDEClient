@@ -1,7 +1,9 @@
 package analysis.flowfunctions.normal;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import heros.FlowFunction;
+import soot.Unit;
 import soot.Value;
 import soot.jimple.internal.JArrayRef;
 import soot.jimple.internal.JInstanceFieldRef;
@@ -10,18 +12,22 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ArrayLoadFF implements FlowFunction<DFF> {
+public class ArrayLoadFF implements FlowFunction<DFF, MetaInfo> {
 
     private DFF zeroValue;
     private AliasHandler aliasHandler;
     private JArrayRef arrayRef;
     private Value lhs;
+    private Unit unit;
+    private MetaInfo info;
 
-    public ArrayLoadFF(JArrayRef arrayRef, Value lhs, DFF zeroValue, AliasHandler aliasHandler) {
+    public ArrayLoadFF(JArrayRef arrayRef, Value lhs, DFF zeroValue, AliasHandler aliasHandler, Unit unit, MetaInfo info) {
         this.arrayRef = arrayRef;
         this.lhs = lhs;
         this.zeroValue = zeroValue;
         this.aliasHandler = aliasHandler;
+        this.unit = unit;
+        this.info = info;
     }
 
 
@@ -37,5 +43,10 @@ public class ArrayLoadFF implements FlowFunction<DFF> {
             aliasHandler.handleAliases(res);
         }
         return res;
+    }
+
+    @Override
+    public MetaInfo getMeta() {
+        return info;
     }
 }

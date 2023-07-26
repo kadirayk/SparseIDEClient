@@ -1,6 +1,7 @@
 package analysis.flowfunctions.call;
 
 import analysis.data.DFF;
+import analysis.data.MetaInfo;
 import analysis.flowfunctions.normal.FieldStoreAliasHandler;
 import heros.FlowFunction;
 import soot.Local;
@@ -10,16 +11,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ReturnFF implements FlowFunction<DFF> {
+public class ReturnFF implements FlowFunction<DFF, MetaInfo> {
 
     private Local tgtLocal;
     private Local retLocal;
     private FieldStoreAliasHandler aliasHandler;
+    private MetaInfo info;
 
-    public ReturnFF(Local tgtLocal, Local retLocal, FieldStoreAliasHandler aliasHandler) {
+    public ReturnFF(Local tgtLocal, Local retLocal, FieldStoreAliasHandler aliasHandler, MetaInfo info) {
         this.tgtLocal = tgtLocal;
         this.retLocal = retLocal;
         this.aliasHandler = aliasHandler;
+        this.info = info;
     }
 
 
@@ -34,5 +37,10 @@ public class ReturnFF implements FlowFunction<DFF> {
             res.add(source);
         }
         return res;
+    }
+
+    @Override
+    public MetaInfo getMeta() {
+        return info;
     }
 }

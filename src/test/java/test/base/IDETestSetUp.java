@@ -10,12 +10,13 @@ import java.io.File;
 
 public abstract class IDETestSetUp {
 
-    protected static JimpleIDESolver<?, ?, ?> solver = null;
-    protected static JimpleSparseIDESolver<?, ?, ?> sparseSolver = null;
+    protected static JimpleIDESolver<?, ?, ?, ?> solver = null;
+    protected static JimpleSparseIDESolver<?, ?, ?, ?> sparseSolver = null;
 
-    protected JimpleIDESolver<?, ?, ?> executeStaticAnalysis(String targetTestClassName) {
+    protected JimpleIDESolver<?, ?, ?, ?> executeStaticAnalysis(String targetTestClassName) {
         setupSoot(targetTestClassName);
         registerSootTransformers();
+        Scene.v().getSootClass("target.constant.Assignment3");
         executeSootTransformers();
         if (solver == null) {
             throw new NullPointerException("Something went wrong solving the IDE problem!");
@@ -23,7 +24,7 @@ public abstract class IDETestSetUp {
         return solver;
     }
 
-    protected JimpleSparseIDESolver<?, ?, ?> executeSparseStaticAnalysis(String targetTestClassName) {
+    protected JimpleSparseIDESolver<?, ?, ?, ?> executeSparseStaticAnalysis(String targetTestClassName) {
         setupSoot(targetTestClassName);
         registerSparseSootTransformers();
         executeSootTransformers();

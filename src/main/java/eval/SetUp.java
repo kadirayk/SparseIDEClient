@@ -11,7 +11,6 @@ import soot.jimple.DefinitionStmt;
 import soot.jimple.IntConstant;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
-import sparse.CPAJimpleSparseCFGBuilder;
 import sparse.DefaultSparseCFGBuilder;
 import sparse.JimpleSparseIDESolver;
 
@@ -20,8 +19,8 @@ import java.util.*;
 
 public class SetUp {
 
-    private static JimpleIDESolver<?, ?, ?> solver;
-    private static JimpleSparseIDESolver<?, ?, ?> sparseSolver;
+    private static JimpleIDESolver<?, ?, ?, ?> solver;
+    private static JimpleSparseIDESolver<?, ?, ?, ?> sparseSolver;
 
     private static List<SootMethod> entryMethods;
 
@@ -68,7 +67,7 @@ public class SetUp {
                     System.out.println("started solving from: " + method.getSignature());
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     @SuppressWarnings({"rawtypes", "unchecked"})
-                    JimpleIDESolver<?, ?, ?> mSolver = new JimpleIDESolver<>(problem);
+                    JimpleIDESolver<?, ?, ?, ?> mSolver = new JimpleIDESolver<>(problem);
                     mSolver.solve();
                     solver = mSolver;
                     mSolver.addFinalResults(method.getSignature());
@@ -92,7 +91,7 @@ public class SetUp {
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
                     @SuppressWarnings({"rawtypes", "unchecked"})
-                    JimpleSparseIDESolver<?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
+                    JimpleSparseIDESolver<?, ?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
                     mSolver.solve();
                     sparseSolver = mSolver;
                     mSolver.addFinalResults(method.toString());

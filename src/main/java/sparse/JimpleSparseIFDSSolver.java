@@ -20,11 +20,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class JimpleSparseIFDSSolver<D, I extends InterproceduralCFG<Unit, SootMethod>> extends SparseIFDSSolver<Unit, D, SootMethod, I> {
+public class JimpleSparseIFDSSolver<D, I extends InterproceduralCFG<Unit, SootMethod>,X> extends SparseIFDSSolver<Unit, D, SootMethod, I,X> {
     private static final Logger logger = LoggerFactory.getLogger(JimpleSparseIFDSSolver.class);
 
 
-    public JimpleSparseIFDSSolver(IFDSTabulationProblem<Unit, D, SootMethod, I> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
+    public JimpleSparseIFDSSolver(IFDSTabulationProblem<Unit, D, SootMethod, I,X> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
         super(problem, sparseCFGBuilder);
     }
 

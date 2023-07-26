@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultSparseCFGBuilderStash implements SparseCFGBuilder<Unit, SootMethod, DFF> {
 
-    private final static Logger LOGGER = Logger.getLogger(CPAJimpleSparseCFGBuilder.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(DefaultSparseCFGBuilderStash.class.getName());
 
     private boolean enableExceptions;
 

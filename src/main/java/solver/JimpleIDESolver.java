@@ -16,12 +16,12 @@ import soot.SootMethod;
 import soot.Unit;
 import util.SortableCSVString;
 
-public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod>> extends IDESolver<Unit, D, SootMethod, V, I> {
+public class JimpleIDESolver<D, V, I extends InterproceduralCFG<Unit, SootMethod>, X> extends IDESolver<Unit, D, SootMethod, V, I, X> {
     private static final Logger logger = LoggerFactory.getLogger(soot.jimple.toolkits.ide.JimpleIDESolver.class);
 
     private static final String OUT_PUT_DIR = "./out";
 
-    public JimpleIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I> problem) {
+    public JimpleIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I, X> problem) {
         super(problem);
     }
 
