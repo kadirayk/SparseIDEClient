@@ -202,11 +202,11 @@ public class DefaultSparseCFGBuilder implements SparseCFGBuilder<Unit, SootMetho
 
     private boolean shouldKeepStmt(Unit unit, DFF d, SootMethod m, DirectedGraph<Unit> graph) {
 
-        if(d.toString().equals("<<zero>>")){
+        if(d.toString().equals("<<zero>>")){ // zero should be mapped to callee's context, and back (this is done with keepControlFlowStmts)
             if(unit instanceof JAssignStmt){
                 JAssignStmt assign = (JAssignStmt) unit;
                 Value rightOp = assign.getRightOp();
-                if(rightOp instanceof IntConstant){
+                if(rightOp instanceof IntConstant || rightOp instanceof InvokeExpr){
                     return true;
                 }
             }

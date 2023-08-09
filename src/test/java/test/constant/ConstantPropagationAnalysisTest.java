@@ -5,6 +5,7 @@ import analysis.data.DFF;
 import heros.InterproceduralCFG;
 import heros.solver.Pair;
 import heros.sparse.SparseCFGBuilder;
+import heros.spcall.DToCalleRelevanceFinder;
 import org.junit.Test;
 import solver.JimpleIDESolver;
 import soot.SceneTransformer;
@@ -12,10 +13,9 @@ import soot.SootMethod;
 import soot.Transformer;
 import soot.Unit;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
-import sparse.CPAJimpleSparseCFGBuilder;
 import sparse.DefaultSparseCFGBuilder;
-import sparse.JimpleDefaultSparseCFG;
 import sparse.JimpleSparseIDESolver;
+import spcall.DefaultDToCalleeRelevanceFinder;
 import target.constant.*;
 import test.base.IDETestSetUp;
 
@@ -54,8 +54,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
                 JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG(false);
                 IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg);
                 SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
+                DToCalleRelevanceFinder dToCalleRelevanceFinder = new DefaultDToCalleeRelevanceFinder();
                 @SuppressWarnings({"rawtypes", "unchecked"})
-                JimpleSparseIDESolver<?, ?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
+                JimpleSparseIDESolver<?, ?, ?, ?> solver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder, dToCalleRelevanceFinder);
                 solver.solve();
                 IDETestSetUp.sparseSolver = solver;
             }

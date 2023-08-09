@@ -6,6 +6,7 @@ import heros.InterproceduralCFG;
 import heros.solver.Pair;
 import heros.sparse.SparseCFGBuilder;
 import heros.sparse.SparseIDESolver;
+import heros.spcall.DToCalleRelevanceFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soot.PatchingChain;
@@ -23,8 +24,8 @@ public class JimpleSparseIDESolver<D, V, I extends InterproceduralCFG<Unit, Soot
 
     private static final String OUT_PUT_DIR = "./out";
 
-    public JimpleSparseIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I,X> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder) {
-        super(problem, sparseCFGBuilder);
+    public JimpleSparseIDESolver(IDETabulationProblem<Unit, D, SootMethod, V, I,X> problem, SparseCFGBuilder<Unit, SootMethod, D> sparseCFGBuilder, DToCalleRelevanceFinder<SootMethod, D> dToCalleRelevanceFinder) {
+        super(problem, sparseCFGBuilder, dToCalleRelevanceFinder);
     }
 
     public void solve(String targetClassName) {

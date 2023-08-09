@@ -5,6 +5,7 @@ import analysis.data.DFF;
 import boomerang.scene.jimple.BoomerangPretransformer;
 import heros.solver.Pair;
 import heros.sparse.SparseCFGBuilder;
+import heros.spcall.DToCalleRelevanceFinder;
 import solver.JimpleIDESolver;
 import soot.*;
 import soot.jimple.DefinitionStmt;
@@ -13,6 +14,7 @@ import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
 import sparse.DefaultSparseCFGBuilder;
 import sparse.JimpleSparseIDESolver;
+import spcall.DefaultDToCalleeRelevanceFinder;
 
 import java.io.File;
 import java.util.*;
@@ -90,8 +92,9 @@ public class SetUp {
                     System.out.println("sparse solving " + method.getSignature());
                     IDELinearConstantAnalysisProblem problem = new IDELinearConstantAnalysisProblem(icfg, method, EvalHelper.getThreadCount());
                     SparseCFGBuilder sparseCFGBuilder = new DefaultSparseCFGBuilder(false);
+                    DToCalleRelevanceFinder dToCalleRelevanceFinder = new DefaultDToCalleeRelevanceFinder();
                     @SuppressWarnings({"rawtypes", "unchecked"})
-                    JimpleSparseIDESolver<?, ?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder);
+                    JimpleSparseIDESolver<?, ?, ?, ?> mSolver = new JimpleSparseIDESolver<>(problem, sparseCFGBuilder, dToCalleRelevanceFinder);
                     mSolver.solve();
                     sparseSolver = mSolver;
                     mSolver.addFinalResults(method.toString());
