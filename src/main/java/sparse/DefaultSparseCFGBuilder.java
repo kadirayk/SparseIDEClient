@@ -1,12 +1,9 @@
 package sparse;
 
 import analysis.data.DFF;
-import com.google.common.collect.Iterators;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
-import fj.P;
-import heros.solver.Pair;
 import heros.sparse.SparseCFG;
 import heros.sparse.SparseCFGBuilder;
 import heros.sparse.SparseCFGQueryStat;
