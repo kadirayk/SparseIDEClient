@@ -1,0 +1,2 @@
+mvn install:install-file -Dfile=./heros-1.2.3-Sparse-SNAPSHOT.jar -DgroupId=de.upb.cs.swt -DartifactId=heros -Dversion=1.2.3-Sparse-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
+mvn install:install-file -Dfile=./boomerangPDS-3.1.2-Sparse-jar-with-dependencies.jar -DgroupId=de.fraunhofer.iem -DartifactId=boomerangPDS -Dversion=3.1.2-Sparse -Dpackaging=jar -DgeneratePom=true
