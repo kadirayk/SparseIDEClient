@@ -69,43 +69,41 @@ public class AliasEval {
         File file = new File(OUT_PUT_DIR + File.separator + FILE);
         if(!file.exists()){
             try (FileWriter writer = new FileWriter(file)) {
-                StringBuilder str = new StringBuilder();
-                str.append("targetProgram");
-                str.append(",");
-                str.append("sparsificationStrategy");
-                str.append(",");
-                str.append("totalAliasQueryTime");
-                str.append(",");
-                str.append("sparseCFGBuildTime");
-                str.append(",");
-                str.append("totalPropagationCount");
-                str.append(",");
-                str.append("cacheHitCount");
-                str.append(",");
-                str.append("cacheMissCount");
-                str.append(System.lineSeparator());
-                writer.write(str.toString());
+                String str = "targetProgram" +
+                        "," +
+                        "sparsificationStrategy" +
+                        "," +
+                        "totalAliasQueryTime" +
+                        "," +
+                        "sparseCFGBuildTime" +
+                        "," +
+                        "totalPropagationCount" +
+                        "," +
+                        "cacheHitCount" +
+                        "," +
+                        "cacheMissCount" +
+                        System.lineSeparator();
+                writer.write(str);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         try (FileWriter writer = new FileWriter(file, true)) {
-            StringBuilder str = new StringBuilder();
-            str.append(targetProgram);
-            str.append(",");
-            str.append(sparsificationStrategy);
-            str.append(",");
-            str.append(totalAliasQueryTime);
-            str.append(",");
-            str.append(sparseCFGBuildTime);
-            str.append(",");
-            str.append(totalPropagationCount);
-            str.append(",");
-            str.append(cacheHitCount);
-            str.append(",");
-            str.append(cacheMissCount);
-            str.append(System.lineSeparator());
-            writer.write(str.toString());
+            String str = targetProgram +
+                    "," +
+                    sparsificationStrategy +
+                    "," +
+                    totalAliasQueryTime +
+                    "," +
+                    sparseCFGBuildTime +
+                    "," +
+                    totalPropagationCount +
+                    "," +
+                    cacheHitCount +
+                    "," +
+                    cacheMissCount +
+                    System.lineSeparator();
+            writer.write(str);
         } catch (IOException e) {
             e.printStackTrace();
         }

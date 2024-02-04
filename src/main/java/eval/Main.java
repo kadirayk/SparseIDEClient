@@ -1,10 +1,12 @@
 package eval;
 
 import com.google.common.base.Stopwatch;
+import config.CallGraphAlgorithm;
 
 import java.io.File;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -17,10 +19,20 @@ public class Main {
         String solver = args[1]; // solver: default or sparse
         int maxMethods = Integer.parseInt(args[2]); // max number of methods to analyze
         int numThreads = Runtime.getRuntime().availableProcessors(); // thread count
-        if(args.length>3){
-            numThreads = Integer.parseInt(args[3]); // thread count
+        try {
+            CallgraphAlgorithm callgraphAlgorithm = parseCallgraphAlgorithm(args[3]);
+            EvalHelper.setCallgraphAlgorithm(callgraphAlgorithm);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(args.length > 4){
+            EvalHelper.setQilin_PTA(args[4]);
+        }
+        if(args.length>5){
+            numThreads = Integer.parseInt(args[5]); // thread count
         }
 
+        EvalHelper.setJarPath(jarPath);
         EvalHelper.setTargetName(getJarName(jarPath));
         EvalHelper.setMaxMethod(maxMethods);
         EvalHelper.setThreadCount(numThreads);
@@ -36,9 +48,9 @@ public class Main {
             setUp.executeSparseStaticAnalysis(jarPath);
             EvalHelper.setTotalPropagationCount(setUp.sparsePropCount);
         }
-        Duration elapsed = stopwatch.elapsed();
+        Duration elapsed = Duration.ofDays(stopwatch.elapsed(TimeUnit.MILLISECONDS));
         EvalHelper.setTotalDuration(elapsed.toMillis());
-        new EvalPrinter(solver).generate();
+//        new EvalPrinter(solver).generate();
     }
 
     private static String getJarName(String fullpath){
@@ -47,6 +59,31 @@ public class Main {
         int endDash = fullpath.lastIndexOf("-");
         int latest = endDot<endDash ? endDash : endDot;
         return fullpath.substring(start + 1, latest);
+    }
+
+    public static CallgraphAlgorithm parseCallgraphAlgorithm(String algo) throws Exception {
+        if (algo.equalsIgnoreCase("AUTO"))
+            return CallgraphAlgorithm.AutomaticSelection;
+        else if (algo.equalsIgnoreCase("CHA"))
+            return CallgraphAlgorithm.CHA;
+        else if (algo.equalsIgnoreCase("VTA"))
+            return CallgraphAlgorithm.VTA;
+        else if (algo.equalsIgnoreCase("RTA"))
+            return CallgraphAlgorithm.RTA;
+        else if (algo.equalsIgnoreCase("SPARK"))
+            return CallgraphAlgorithm.SPARK;
+        else if (algo.equalsIgnoreCase("GEOM"))
+            return CallgraphAlgorithm.GEOM;
+        else if (algo.equalsIgnoreCase("QILIN"))
+            return CallgraphAlgorithm.QILIN;
+        else {
+            System.err.printf("Invalid callgraph algorithm: %s%n", algo);
+            throw new Exception();
+        }
+    }
+
+    public enum CallgraphAlgorithm {
+        AutomaticSelection, CHA, VTA, RTA, SPARK, GEOM, OnDemand, QILIN
     }
 
 }

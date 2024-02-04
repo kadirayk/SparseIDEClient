@@ -2,19 +2,21 @@ package test.constant;
 
 import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
+import eval.EvalHelper;
+import eval.Main;
 import heros.InterproceduralCFG;
 import heros.solver.Pair;
 import heros.sparse.SparseCFGBuilder;
+import org.junit.Before;
 import org.junit.Test;
 import solver.JimpleIDESolver;
-import soot.SceneTransformer;
-import soot.SootMethod;
-import soot.Transformer;
-import soot.Unit;
+import soot.*;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import sparse.DefaultSparseCFGBuilder;
 import sparse.JimpleSparseIDESolver;
 import target.constantbench.*;
+import target.constantbench.Context;
+import test.TestRunner;
 import test.base.IDETestSetUp;
 
 import java.util.HashSet;
@@ -28,6 +30,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ConstantPropagationAnalysisTest extends IDETestSetUp {
+
+    public static Main.CallgraphAlgorithm cg_algo = Main.CallgraphAlgorithm.CHA;
+
+    public static String qilin_pta = "";
+
+    public static String currentMethodName = "Context";
 
     @Override
     protected Transformer createAnalysisTransformer() {
@@ -58,6 +66,23 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
                 IDETestSetUp.sparseSolver = solver;
             }
         };
+    }
+
+    @Before
+    public void setUp() {
+        setEvaluationConfig();
+    }
+
+    private void setEvaluationConfig(){
+        String contentRootPath = "target/test-classes/target/constantbench";
+        String path = contentRootPath +
+                "/" + currentMethodName;
+        EvalHelper.setJarPath(path);
+        System.out.println("Evaluating " +  currentMethodName + " with " + (cg_algo.toString().contains("QILIN") ? qilin_pta : cg_algo));
+        EvalHelper.setCallgraphAlgorithm(cg_algo);
+        if(!qilin_pta.isEmpty()){
+            EvalHelper.setQilin_PTA(qilin_pta);
+        }
     }
 
     private Set<Pair<String, Integer>> getResult(Object analysis) {
@@ -92,9 +117,9 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
     private String msg(Set<Pair<String, Integer>> actual, Set<Pair<String, Integer>> expected) {
         StringBuilder str = new StringBuilder(System.lineSeparator());
         str.append("actual:").append(System.lineSeparator());
-        str.append(actual.stream().map(p -> p.toString()).collect(Collectors.joining("-"))).append(System.lineSeparator());
+        str.append(actual.stream().map(Pair::toString).collect(Collectors.joining("-"))).append(System.lineSeparator());
         str.append("expected:").append(System.lineSeparator());
-        str.append(expected.stream().map(p -> p.toString()).collect(Collectors.joining("-"))).append(System.lineSeparator());
+        str.append(expected.stream().map(Pair::toString).collect(Collectors.joining("-"))).append(System.lineSeparator());
         return str.toString();
     }
 
@@ -646,6 +671,12 @@ public class ConstantPropagationAnalysisTest extends IDETestSetUp {
         expected.add(new Pair("B.i_42", 100));
         expected.add(new Pair("a", 100));
         checkResults(defaultIDEResult, sparseIDEResult, expected, name);
+    }
+
+    @Test
+    public void checkCallGraphs(){
+        String methodName = "target.constantbench." + currentMethodName;
+        assertEquals(getCallGraph(methodName), getCallGraph(methodName));
     }
 
 
