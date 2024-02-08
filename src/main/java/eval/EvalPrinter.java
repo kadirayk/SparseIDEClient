@@ -52,55 +52,83 @@ public class EvalPrinter {
         File file = new File(OUT_PUT_DIR + File.separator + FILE);
         if(!file.exists()){
             try (FileWriter writer = new FileWriter(file)) {
-                StringBuilder str = new StringBuilder();
-                str.append("jar");
-                str.append(",");
-                str.append("solver");
-                str.append(",");
-                str.append("thread");
-                str.append(",");
-                str.append("runtime");
-                str.append(",");
-                str.append("prop");
-                str.append(",");
-                str.append("method");
-                str.append(",");
-                str.append("SCFGConst");
-                str.append(",");
-                str.append("SCFGCount");
-                str.append(",");
-                str.append("mem");
-                str.append(System.lineSeparator());
-                writer.write(str.toString());
+                String str = "jar" +
+                        "," +
+                        "solver" +
+                        "," +
+                        "thread" +
+                        "," +
+                        "runtime" +
+                        "," +
+                        "prop" +
+                        "," +
+                        "method" +
+                        "," +
+                        "SCFGConst" +
+                        "," +
+                        "SCFGCount" +
+                        "," +
+                        "mem" +
+                        "," +
+                        "cg_edges" +
+                        "," +
+                        "cg_name" +
+                        "," +
+                        "cg_time" +
+                        "," +
+                        "num_methods_propagated" +
+                        "," +
+                        "reachable_methods" +
+                        System.lineSeparator();
+                writer.write(str);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         try (FileWriter writer = new FileWriter(file, true)) {
-            StringBuilder str = new StringBuilder();
-            str.append(targetProgram);
-            str.append(",");
-            str.append(solver);
-            str.append(",");
-            str.append(threadCount);
-            str.append(",");
-            str.append(totalDuration);
-            str.append(",");
-            str.append(totalPropagationCount);
-            str.append(",");
-            str.append(methodCount);
-            str.append(",");
-            str.append(sparseCFGBuildtime);
-            str.append(",");
-            str.append(scfgBuildCount);
-            str.append(",");
-            str.append(getMemoryUsage());
-            str.append(System.lineSeparator());
-            writer.write(str.toString());
+            String str = targetProgram +
+                    "," +
+                    solver +
+                    "," +
+                    threadCount +
+                    "," +
+                    totalDuration +
+                    "," +
+                    totalPropagationCount +
+                    "," +
+                    methodCount +
+                    "," +
+                    sparseCFGBuildtime +
+                    "," +
+                    scfgBuildCount +
+                    "," +
+                    getMemoryUsage() +
+                    "," +
+                    EvalHelper.getNumber_of_cg_Edges() +
+                    "," +
+                    getCg_name() +
+                    "," +
+                    EvalHelper.getCg_construction_duration() +
+                    ","+
+                    EvalHelper.getNumber_of_methods_propagated() +
+                    "," +
+                    EvalHelper.getNumber_of_reachable_methods() +
+                    System.lineSeparator();
+            writer.write(str);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private static String getCg_name(){
+        if(EvalHelper.getCallgraphAlgorithm() != Main.CallgraphAlgorithm.QILIN){
+            return EvalHelper.getCallgraphAlgorithm().toString();
+        }
+        else{
+            return EvalHelper.getQilin_PTA();
+        }
+    }
+
 
     /**
      * in MB

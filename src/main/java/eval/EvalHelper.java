@@ -9,6 +9,20 @@ public class EvalHelper {
     private static long totalPropagationCount = 0;
     private static int actualMethodCount = 0;
 
+    private static String jarPath;
+
+    private static  Main.CallgraphAlgorithm callgraphAlgorithm;
+
+    private static long cg_construction_duration = 0;
+
+    private static String qilin_PTA;
+
+    private static int number_of_cg_Edges;
+
+    private static long number_of_methods_propagated = 0;
+
+    private static int number_of_reachable_methods = 0;
+
 
     public static int getThreadCount() {
         return threadCount;
@@ -56,5 +70,61 @@ public class EvalHelper {
 
     public static void setTargetName(String targetName) {
         EvalHelper.targetName = targetName;
+    }
+
+    public static String getJarPath() {
+        return jarPath;
+    }
+
+    public static void setJarPath(String jarPath) {
+        EvalHelper.jarPath = jarPath;
+    }
+
+    public static Main.CallgraphAlgorithm getCallgraphAlgorithm() {
+        return callgraphAlgorithm;
+    }
+
+    public static void setCallgraphAlgorithm(Main.CallgraphAlgorithm callgraphAlgorithm) {
+        EvalHelper.callgraphAlgorithm = callgraphAlgorithm;
+    }
+
+    public static String getQilin_PTA() {
+        return qilin_PTA;
+    }
+
+    public static void setQilin_PTA(String qilin_PTA) {
+        EvalHelper.qilin_PTA = qilin_PTA;
+    }
+
+    public static int getNumber_of_cg_Edges() {
+        return number_of_cg_Edges;
+    }
+
+    public static void setNumber_of_cg_Edges(int number_of_cg_Edges) {
+        EvalHelper.number_of_cg_Edges = number_of_cg_Edges;
+    }
+
+    public static long getCg_construction_duration() {
+        return cg_construction_duration;
+    }
+
+    public static void setCg_construction_duration(long cg_construction_duration) {
+        EvalHelper.cg_construction_duration = EvalHelper.cg_construction_duration + cg_construction_duration;
+    }
+
+    public static long getNumber_of_methods_propagated() {
+        return number_of_methods_propagated;
+    }
+
+    public static void setNumber_of_methods_propagated(long number_of_methods_propagated) {
+        EvalHelper.number_of_methods_propagated += number_of_methods_propagated;
+    }
+
+    public static int getNumber_of_reachable_methods() {
+        return number_of_reachable_methods;
+    }
+
+    public static void setNumber_of_reachable_methods(int number_of_reachable_methods) {
+        EvalHelper.number_of_reachable_methods = number_of_reachable_methods;
     }
 }

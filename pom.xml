@@ -9,6 +9,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<callgraph.version>1.2-SNAPSHOT</callgraph.version>
 	</properties>
 
 	<build>
@@ -63,12 +64,23 @@
 			<groupId>de.upb.cs.swt</groupId>
 			<artifactId>heros</artifactId>
 			<version>1.2.3-Sparse-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.soot-oss</groupId>
+					<artifactId>soot</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.example.pal</groupId>
+			<artifactId>callgraph</artifactId>
+			<version>${callgraph.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.fraunhofer.iem</groupId>

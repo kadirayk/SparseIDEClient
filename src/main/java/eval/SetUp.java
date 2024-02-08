@@ -2,9 +2,14 @@ package eval;
 
 import analysis.IDELinearConstantAnalysisProblem;
 import analysis.data.DFF;
+import application.CallGraphApplication;
 import boomerang.scene.jimple.BoomerangPretransformer;
+import com.google.common.base.Stopwatch;
+import config.CallGraphAlgorithm;
+import config.CallGraphConfig;
 import heros.solver.Pair;
 import heros.sparse.SparseCFGBuilder;
+import metrics.CallGraphMetricsWrapper;
 import solver.JimpleIDESolver;
 import soot.*;
 import soot.jimple.DefinitionStmt;
@@ -17,6 +22,7 @@ import sparse.JimpleSparseIDESolver;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class SetUp {
 
@@ -40,13 +46,68 @@ public class SetUp {
         executeSootTransformers();
     }
 
+    private CallGraphConfig constructCallGraphConfig() {
+        CallGraphConfig callGraphConfig = CallGraphConfig.getInstance();
+        callGraphConfig.setAppPath(EvalHelper.getJarPath());
+        CallGraphAlgorithm callgraphAlgorithm = configureCallgraph(EvalHelper.getCallgraphAlgorithm());
+        callGraphConfig.setCallGraphAlgorithm(callgraphAlgorithm);
+        callGraphConfig.setIsSootSceneProvided(true);
+        if (callgraphAlgorithm == CallGraphAlgorithm.QILIN) {
+            callGraphConfig.setQilinPta(EvalHelper.getQilin_PTA());
+        }
+        return callGraphConfig;
+    }
+
+    protected CallGraphAlgorithm configureCallgraph(Main.CallgraphAlgorithm callgraphAlgorithm) {
+        // Configure the callgraph algorithm
+        CallGraphAlgorithm callGraphAlgorithm;
+        switch (callgraphAlgorithm) {
+            case QILIN:
+                callGraphAlgorithm = CallGraphAlgorithm.QILIN;
+                break;
+            case AutomaticSelection:
+            case SPARK:
+                callGraphAlgorithm = CallGraphAlgorithm.SPARK;
+                break;
+            case GEOM:
+                callGraphAlgorithm = CallGraphAlgorithm.GEOM;
+                break;
+            case CHA:
+                callGraphAlgorithm = CallGraphAlgorithm.CHA;
+                break;
+            case RTA:
+                callGraphAlgorithm = CallGraphAlgorithm.RTA;
+                break;
+            case VTA:
+                callGraphAlgorithm = CallGraphAlgorithm.VTA;
+                break;
+            default:
+                throw new RuntimeException("Invalid callgraph algorithm");
+        }
+        return callGraphAlgorithm;
+    }
+
     private void executeSootTransformers() {
         //Apply all necessary packs of soot. This will execute the respective Transformer
-        PackManager.v().getPack("cg").apply();
-        // Must have for Boomerang
-        BoomerangPretransformer.v().reset();
-        BoomerangPretransformer.v().apply();
-        PackManager.v().getPack("wjtp").apply();
+        try {
+            PackManager.v().getPack("cg").apply();
+            Scene.v().releaseCallGraph();
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            CallGraphMetricsWrapper callGraphMetrics = CallGraphApplication.generateCallGraph(Scene.v(), constructCallGraphConfig());
+            EvalHelper.setCg_construction_duration(stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            Scene.v().setCallGraph(callGraphMetrics.getCallGraph());
+            EvalHelper.setNumber_of_cg_Edges(Scene.v().getCallGraph().size());
+            EvalHelper.setNumber_of_reachable_methods(Scene.v().getReachableMethods().size());
+            System.out.println("Number of CallGraph edges: " + Scene.v().getCallGraph().size());
+            // Must have for Boomerang
+            BoomerangPretransformer.v().reset();
+            BoomerangPretransformer.v().apply();
+            PackManager.v().getPack("wjtp").apply();
+        }
+        catch (Exception exception){
+            exception.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private void registerSootTransformers() {
@@ -71,6 +132,7 @@ public class SetUp {
                     JimpleIDESolver<?, ?, ?> mSolver = new JimpleIDESolver<>(problem);
                     mSolver.solve();
                     solver = mSolver;
+                    EvalHelper.setNumber_of_methods_propagated(mSolver.methodsPropagatedCount);
                     mSolver.addFinalResults(method.getSignature());
                     getResult(mSolver, method);
                 }
@@ -96,6 +158,7 @@ public class SetUp {
                     mSolver.solve();
                     sparseSolver = mSolver;
                     mSolver.addFinalResults(method.toString());
+                    EvalHelper.setNumber_of_methods_propagated(mSolver.methodsPropagatedCount);
                     getResult(mSolver, method);
                 }
                 if(sparseSolver!=null){
